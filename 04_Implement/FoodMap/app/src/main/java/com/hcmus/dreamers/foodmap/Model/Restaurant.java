@@ -19,6 +19,7 @@ public class Restaurant {
     private GeoPoint location;
     private List<Dish> dishes;
     private List<Comment> comments;
+    private String address;
 
     // bảng lưu thông tin người đánh giá
     // keyvalue: <email, star>
@@ -115,5 +116,13 @@ public class Restaurant {
 
     public void setLocation(GeoPoint location) {
         this.location = location;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
