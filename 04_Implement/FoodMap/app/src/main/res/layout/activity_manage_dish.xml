@@ -126,6 +126,7 @@ android:layout_height="match_parent">
         android:layout_margin="16dp"
         android:backgroundTint="#cf2a27"
         android:src="@android:drawable/ic_input_add"
-        android:tint="@android:color/white" />
+        android:tint="@android:color/white"
+        app:fabSize="normal"/>
 
 </android.support.design.widget.CoordinatorLayout>
