@@ -1,4 +1,4 @@
-package com.hcmus.dreamers.foodmap.Model;
+package com.hcmus.dreamers.foodmap.model;
 
 public class Owner extends User {
 

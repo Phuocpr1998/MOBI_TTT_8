@@ -1,6 +1,5 @@
-package com.hcmus.dreamers.foodmap.Model;
+package com.hcmus.dreamers.foodmap.model;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class Guest extends User {

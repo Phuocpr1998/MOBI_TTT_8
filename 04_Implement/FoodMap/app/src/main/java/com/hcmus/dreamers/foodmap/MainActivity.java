@@ -4,6 +4,8 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -14,6 +16,9 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.hcmus.dreamers.foodmap.event.LocationChange;
+import com.hcmus.dreamers.foodmap.event.MarkerClick;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -28,14 +33,14 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements LocationListener {
+public class MainActivity extends AppCompatActivity {
 
     private MapView mMap;
     private MyLocationNewOverlay mLocationOverlay;
     private LocationManager mLocMgr;
-    IMapController mapController;
-    boolean isPermissionOK;
-    ArrayList<OverlayItem> items;
+    private  IMapController mapController;
+    private boolean isPermissionOK;
+    private ArrayList<OverlayItem> markers;
 
     private static final int PERMISSION_CODEREQUEST = 9001;
 
@@ -60,91 +65,69 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mMap = (MapView) findViewById(R.id.map);
         isPermissionOK = false;
 
-        Context ctx = getApplicationContext();
-        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
-
-        mMap = (MapView) findViewById(R.id.map);
-        mMap.setTileSource(TileSourceFactory.MAPNIK);
-
+        // cài đặt map
         mMap.setBuiltInZoomControls(true);
         mMap.setMultiTouchControls(true);
         if (Build.VERSION.SDK_INT >= 16)
             mMap.setHasTransientState(true);
+
+        mapController = mMap.getController();
+        mapController.setZoom(17.0);
+        mMap = (MapView) findViewById(R.id.map);
+        mMap.setTileSource(TileSourceFactory.MAPNIK);
+
+        //list marker
+        markers = new ArrayList<OverlayItem>();
+
+        // cài đặt marker vị trí
+        this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(MainActivity.this),mMap);
+        Bitmap iconMyLocation = BitmapFactory.decodeResource(getResources(),R.drawable.ic_mylocation);
+        mLocationOverlay.setPersonIcon(iconMyLocation);
+        mapController.setCenter(this.mLocationOverlay.getMyLocation());
+        // thêm marker vào
+        mMap.getOverlays().add(this.mLocationOverlay);
 
         // check permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkPermission();
         }
 
+        // cài đặt event location change
         if (!isPermissionOK)
             return;
+        Context ctx = getApplicationContext();
+        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         //
         mLocMgr = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         mLocMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 100,
-                this);
-
-        //your items
-        items = new ArrayList<OverlayItem>();
-
-        mapController = mMap.getController();
-        mapController.setZoom(17.0);
-
-        this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(MainActivity.this),mMap);
-        mapController.setCenter(this.mLocationOverlay.getMyLocation());
-        mMap.getOverlays().add(this.mLocationOverlay);
+                new LocationChange(mMap, mLocationOverlay, mapController));
     }
 
-
-    private void addMarker(String title, String description, GeoPoint point){
+    // thêm một marker vào map
+    private ItemizedOverlayWithFocus<OverlayItem> addMarker(String title, String description, GeoPoint point){
         mapController.setZoom(17.0);
-        items.add(new OverlayItem(title, description, point)); // Lat/Lon decimal degrees
-        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(MainActivity.this, items, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
-            @Override
-            public boolean onItemSingleTapUp(int i, OverlayItem overlayItem) {
-                return false;
-            }
-
-            @Override
-            public boolean onItemLongPress(int i, OverlayItem overlayItem) {
-                return false;
-            }
-        });
+        markers.add(new OverlayItem(title, description, point)); // Lat/Lon decimal degrees
+        // thêm sự kiện marker click
+        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(MainActivity.this, markers, new MarkerClick());
         mOverlay.setFocusItemsOnTap(true);
-
+        // thêm marker vào map
         mMap.getOverlays().add(mOverlay);
+        mMap.invalidate();
+        return mOverlay;
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        double mLatitude = location.getLatitude();
-        double mLongtitude = location.getLongitude();
-
-        GeoPoint gpt = new GeoPoint(mLatitude, mLongtitude);
-        mapController.setCenter(gpt);
-        mMap.getOverlays().clear();
-        mMap.getOverlays().add(this.mLocationOverlay);
+    // xóa marker ra khỏi map
+    private void deleteMarker(ItemizedOverlayWithFocus<OverlayItem> marker)
+    {
+        mMap.getOverlays().add(marker);
         mMap.invalidate();
     }
 
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
 
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
-
-
+    // kiểm tra permission
     @TargetApi(Build.VERSION_CODES.M)
     @RequiresApi(api = Build.VERSION_CODES.M)
     void checkPermission(){

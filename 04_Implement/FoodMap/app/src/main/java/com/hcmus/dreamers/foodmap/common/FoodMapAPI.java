@@ -13,11 +13,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
-import com.hcmus.dreamers.foodmap.Model.Comment;
-import com.hcmus.dreamers.foodmap.Model.Dish;
-import com.hcmus.dreamers.foodmap.Model.Owner;
-import com.hcmus.dreamers.foodmap.Model.Restaurant;
-import com.hcmus.dreamers.foodmap.Model.User;
+import com.hcmus.dreamers.foodmap.model.Comment;
+import com.hcmus.dreamers.foodmap.model.Dish;
+import com.hcmus.dreamers.foodmap.model.Owner;
+import com.hcmus.dreamers.foodmap.model.Restaurant;
 import com.hcmus.dreamers.foodmap.define.Constant;
 
 import org.json.JSONException;
