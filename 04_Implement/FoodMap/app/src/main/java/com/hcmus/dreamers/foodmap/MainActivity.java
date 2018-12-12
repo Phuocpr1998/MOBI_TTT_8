@@ -51,14 +51,16 @@ import com.hcmus.dreamers.foodmap.database.FoodMapManager;
 import com.hcmus.dreamers.foodmap.define.ConstantCODE;
 import com.hcmus.dreamers.foodmap.define.ConstantURL;
 import com.hcmus.dreamers.foodmap.event.LocationChange;
-import com.hcmus.dreamers.foodmap.map.ZoomLimitMapView;
 import com.hcmus.dreamers.foodmap.service.OrderService;
 import com.hcmus.dreamers.foodmap.websocket.OrderSocket;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.util.TileSystem;
+import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.OverlayItem;
@@ -80,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private NavigationView navigationMenu;
 
-    private ZoomLimitMapView mMap;
+    private MapView mMap;
     private MyLocationNewOverlay mLocationOverlay;
     private LocationManager mLocMgr;
     private IMapController mapController;
@@ -168,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
     private void mapInit()
     {
         //
-        mMap = (ZoomLimitMapView) findViewById(R.id.map);
+        mMap = (MapView) findViewById(R.id.map);
 
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
@@ -180,6 +182,13 @@ public class MainActivity extends AppCompatActivity {
         // cài đặt map
         mMap.setBuiltInZoomControls(true);
         mMap.setMultiTouchControls(true);
+        mMap.setMinZoomLevel(3.0);
+        mMap.setMaxZoomLevel(21.0);
+        mMap.setVerticalMapRepetitionEnabled(false);
+        mMap.setScrollableAreaLimitDouble(new BoundingBox(
+                TileSystem.MaxLatitude, TileSystem.MaxLongitude,
+                TileSystem.MinLatitude, TileSystem.MinLongitude));
+
         if (Build.VERSION.SDK_INT >= 16)
             mMap.setHasTransientState(true);
 

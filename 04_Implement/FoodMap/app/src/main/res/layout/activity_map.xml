@@ -18,7 +18,7 @@
         android:elevation="4dp"
         android:layout_gravity="top"/>
 
-    <com.hcmus.dreamers.foodmap.map.ZoomLimitMapView
+    <org.osmdroid.views.MapView
         android:id="@+id/FindWayMap"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
