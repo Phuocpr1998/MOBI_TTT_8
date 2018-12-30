@@ -1,9 +1,9 @@
 ﻿Mô tả API FoodMapServer: tất cả các api đều có baseaddress là: http://foodmap.tk/
 ** Các trường hợp không hợp lệ sẽ có các response["status"] lần lượt là:
 	+ 200 : Success
-	+ 404 : Not Found
+	+ 404 : Exec fail
 	+ 400 : Invalid request
-	+ 444 : token invalid
+	+ 444 : Invalid token
 
 - Login:
 	+ url: login.php

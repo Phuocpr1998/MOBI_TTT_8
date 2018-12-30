@@ -11,6 +11,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 import com.hcmus.dreamers.foodmap.AddDiscountActivity;
 import com.hcmus.dreamers.foodmap.AsyncTask.TaskCompleteCallBack;
 import com.hcmus.dreamers.foodmap.Model.Discount;
+import com.hcmus.dreamers.foodmap.Model.Dish;
 import com.hcmus.dreamers.foodmap.Model.Restaurant;
 import com.hcmus.dreamers.foodmap.R;
 import com.hcmus.dreamers.foodmap.adapter.DiscountListAdapter;
@@ -40,13 +42,16 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class DiscountListFragment extends Fragment implements AdapterView.OnItemLongClickListener, AbsListView.MultiChoiceModeListener{
+    private static final String TAG = "DiscountListFragment";
     Restaurant restaurant;
 
     private ListView lvDiscount;
     private FloatingActionButton fabAddDiscount;
     private DiscountListAdapter discountListAdapter;
     private List<Discount> discounts, discountAdapter;
+    private List<Dish> dishes;
     private int id_rest;
 
     Context context = null;
@@ -73,7 +78,6 @@ public class DiscountListFragment extends Fragment implements AdapterView.OnItem
     @Override
     public void onResume() {
         super.onResume();
-
         FoodMapApiManager.getDiscount(id_rest, new TaskCompleteCallBack() {
             @Override
             public void OnTaskComplete(Object response) {
@@ -115,11 +119,12 @@ public class DiscountListFragment extends Fragment implements AdapterView.OnItem
         rootLayout =(CoordinatorLayout) inflater.inflate(R.layout.fragment_manage_discount, container, false);
 
         references();
-
+        Log.d(TAG, "onCreateView");
         fabAddDiscount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-				if (discounts == null || discounts.isEmpty()) {
+                List<Dish> dishes = restaurant.getDishes();
+				if (restaurant == null || dishes == null || dishes.isEmpty()) {
                     Toast.makeText(context, "Quán chưa có món ăn nào, không thể tạo Discount!", Toast.LENGTH_SHORT).show();
                     return;
                 }

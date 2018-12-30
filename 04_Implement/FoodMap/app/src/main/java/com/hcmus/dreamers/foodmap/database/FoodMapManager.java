@@ -175,7 +175,7 @@ public class FoodMapManager {
         dbManager.close();
     }
 
-    public static void setFavoriteRestaurant(int restID, String guestEmail, int star){
+    public static void addRankRestaurant(int restID, String guestEmail, int star){
         for(int i = 0; i < restaurants.size(); i++)
         {
             if( restaurants.get(i).getId() == restID){

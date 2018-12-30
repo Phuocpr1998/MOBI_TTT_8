@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,13 +47,13 @@ import java.util.stream.Collectors;
 public class OrderListFragment extends Fragment implements AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener {
 
     Restaurant restaurant;
+    private static final String TAG = "OrderListFragment";
 
     private ListView listOffer;
     private OrderListAdapter adapter;
     private List<Offer> offers, offersAdapter;
     private int id_rest;
     private Calendar c = Calendar.getInstance();
-    private ProgressDialog progressDialog;
 
     Context context = null;
     LinearLayout rootLayout;
@@ -89,6 +90,7 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
         // Inflate the layout for this fragment
         rootLayout =(LinearLayout) inflater.inflate(R.layout.fragment_order_list, container, false);
 
@@ -104,10 +106,6 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
 
 
     private void refreshData(boolean filter, int year,int monthOfYear ,int dayOfMonth){
-        progressDialog = new ProgressDialog(context);
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.setMessage("Loading...");
-        progressDialog.show();
         FoodMapApiManager.getOffer(id_rest, new TaskCompleteCallBack() {
             @Override
             public void OnTaskComplete(Object response) {
@@ -123,7 +121,6 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
                             filter(year, monthOfYear, dayOfMonth);
                         }
                         adapter.notifyDataSetChanged();
-                        progressDialog.dismiss();
                     }else if(responseJSON.getCode() == ConstantCODE.NOTFOUND){
                         Toast.makeText(context, "NOT FOUND!", Toast.LENGTH_SHORT).show();
                     }else {
