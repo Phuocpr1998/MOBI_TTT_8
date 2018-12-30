@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DishListFragment extends Fragment {
-
+    private static final String TAG = "DishListFragment";
     int selectedRow = -1;
     List<Dish> dishes;
     Restaurant restaurant;
@@ -73,12 +74,13 @@ public class DishListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
         // Inflate the layout for this fragment
         rootLayout = (CoordinatorLayout) inflater.inflate(
                 R.layout.fragment_dish_list, container, false);
 
         setup();
-        handleClickEvnet();
+        handleClickEvent();
 
         return rootLayout;
     }
@@ -94,7 +96,7 @@ public class DishListFragment extends Fragment {
         dishListView.setAdapter(adapter);
     }
 
-    private void handleClickEvnet() {
+    private void handleClickEvent() {
         // Chọn 1 món ăn từ danh sách
         dishListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
