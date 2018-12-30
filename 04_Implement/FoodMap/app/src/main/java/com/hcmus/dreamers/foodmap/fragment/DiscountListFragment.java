@@ -32,7 +32,6 @@ import com.hcmus.dreamers.foodmap.R;
 import com.hcmus.dreamers.foodmap.adapter.DiscountListAdapter;
 import com.hcmus.dreamers.foodmap.common.FoodMapApiManager;
 import com.hcmus.dreamers.foodmap.common.ResponseJSON;
-import com.hcmus.dreamers.foodmap.database.FoodMapManager;
 import com.hcmus.dreamers.foodmap.define.ConstantCODE;
 import com.hcmus.dreamers.foodmap.jsonapi.ParseJSON;
 
