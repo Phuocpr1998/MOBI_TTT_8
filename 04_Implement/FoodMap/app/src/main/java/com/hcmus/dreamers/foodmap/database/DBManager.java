@@ -486,6 +486,8 @@ public class DBManager extends SQLiteOpenHelper {
 
         Cursor cursor = db.query(TABLE_COMMENTS, null, KEY_ID_REST + " = ?", new String[] {String.valueOf(id_rest)},
                 null, null, KEY_DATE_TIME);
+        if (cursor == null)
+            return comments;
 
         if (cursor.moveToFirst())
         {
@@ -511,6 +513,9 @@ public class DBManager extends SQLiteOpenHelper {
 
         Cursor cursor = db.query(TABLE_DISH, null, KEY_ID_REST + "=?",
                 new String[] {String.valueOf(id_rest)}, null, null, null);
+
+        if (cursor == null)
+            return dishes;
 
         if (cursor.moveToFirst())
         {
@@ -553,6 +558,8 @@ public class DBManager extends SQLiteOpenHelper {
 
         Cursor cursor = db.query(TABLE_RANK, null, KEY_ID_REST + "=?", new String[] {String.valueOf(id_rest)},
                 null, null,null);
+        if (cursor == null)
+            return  ranks;
 
         if (cursor.moveToFirst())
         {
@@ -608,6 +615,8 @@ public class DBManager extends SQLiteOpenHelper {
         List<Restaurant> restaurants = new ArrayList<>();
 
         Cursor cursor = db.query(TABLE_RESTAURANT, null, null, null, null,null, KEY_ID);
+        if (cursor == null)
+            return restaurants;
 
         if (cursor.moveToFirst())
         {
