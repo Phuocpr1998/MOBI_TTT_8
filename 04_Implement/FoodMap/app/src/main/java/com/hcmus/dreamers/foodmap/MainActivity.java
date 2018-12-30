@@ -57,6 +57,9 @@ import com.hcmus.dreamers.foodmap.websocket.OrderSocket;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
@@ -202,6 +205,20 @@ public class MainActivity extends AppCompatActivity {
 
         mapController.setCenter(this.mLocationOverlay.getMyLocation());
         mMap.getOverlays().add(this.mLocationOverlay);
+
+        mMap.setMapListener(new MapListener() {
+            @Override
+            public boolean onScroll(ScrollEvent scrollEvent) {
+                Log.w("boundingBox",mMap.getBoundingBox().toString()); // N: E: S: W:
+                return true;
+            }
+
+            @Override
+            public boolean onZoom(ZoomEvent zoomEvent) {
+                Log.w("boundingBox",mMap.getBoundingBox().toString()); // N: E: S: W:
+                return true;
+            }
+        });
     }
 
     // thêm một marker vào map
@@ -592,5 +609,38 @@ public class MainActivity extends AppCompatActivity {
                 progressDialog.dismiss();
             }
         });
+    }
+
+    // Bounding Box definition:
+    // https://wiki.openstreetmap.org/wiki/Bounding_Box
+    //
+    //              ------* (North, East)
+    //              |     |
+    //              |     |
+    //(South, West) *------
+
+    // Gọi phương thức này khi lần đầu vào hoặc khi người dùng ấn nút cập nhật dữ liệu khu vực
+
+    private List<Restaurant> getBoundingBoxData(){
+        double minLat, minLon;
+        double maxLat, maxLon;
+        minLat = mMap.getBoundingBox().getLatSouth();
+        minLon = mMap.getBoundingBox().getLonWest();
+        maxLat = mMap.getBoundingBox().getLatNorth();
+        maxLon = mMap.getBoundingBox().getLonEast();
+
+        List<Restaurant> result = new ArrayList<>();
+        for (Restaurant restaurant: FoodMapManager.getRestaurants())
+        {
+            double Lat = restaurant.getLocation().getLatitude();
+            double Lon = restaurant.getLocation().getLongitude();
+
+            if ((minLat <= Lat && Lat <= maxLat) &&
+                    (minLon <= Lon && Lon <= maxLon))
+            {
+                result.add(restaurant);
+            }
+        }
+        return result;
     }
 }
