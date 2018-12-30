@@ -210,12 +210,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onScroll(ScrollEvent scrollEvent) {
                 Log.w("boundingBox",mMap.getBoundingBox().toString()); // N: E: S: W:
+                List<Restaurant> restaurants = getBoundingBoxData();
+                Log.w("dataSize", String.valueOf(restaurants.size()));
                 return true;
             }
 
             @Override
             public boolean onZoom(ZoomEvent zoomEvent) {
                 Log.w("boundingBox",mMap.getBoundingBox().toString()); // N: E: S: W:
+                List<Restaurant> restaurants = getBoundingBoxData();
+                Log.w("dataSize", String.valueOf(restaurants.size()));
                 return true;
             }
         });
