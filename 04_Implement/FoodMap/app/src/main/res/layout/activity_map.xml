@@ -15,6 +15,7 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         android:background="?attr/colorAccent"
+        app:title="Chỉ dẫn"
         android:elevation="4dp"
         android:layout_gravity="top"/>
 
