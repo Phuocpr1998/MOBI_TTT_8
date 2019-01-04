@@ -586,8 +586,8 @@ public class DBManager extends SQLiteOpenHelper {
         DateFormat df = new SimpleDateFormat("HH:mm");
 
         Restaurant restaurant = new Restaurant(id_rest,
-                cursor.getString(cursor.getColumnIndex(KEY_NAME)),
                 cursor.getString(cursor.getColumnIndex(KEY_OWNER_USERNAME)),
+                cursor.getString(cursor.getColumnIndex(KEY_NAME)),
                 cursor.getString(cursor.getColumnIndex(KEY_ADDRESS)),
                 cursor.getString(cursor.getColumnIndex(KEY_PHONE_NUMBER)),
                 cursor.getString(cursor.getColumnIndex(KEY_DESCRIBE_TEXT)),
@@ -624,8 +624,8 @@ public class DBManager extends SQLiteOpenHelper {
 
             do {
                 Restaurant restaurant = new Restaurant(cursor.getInt(cursor.getColumnIndex(KEY_ID)),
-                        cursor.getString(cursor.getColumnIndex(KEY_NAME)),
                         cursor.getString(cursor.getColumnIndex(KEY_OWNER_USERNAME)),
+                        cursor.getString(cursor.getColumnIndex(KEY_NAME)),
                         cursor.getString(cursor.getColumnIndex(KEY_ADDRESS)),
                         cursor.getString(cursor.getColumnIndex(KEY_PHONE_NUMBER)),
                         cursor.getString(cursor.getColumnIndex(KEY_DESCRIBE_TEXT)),
