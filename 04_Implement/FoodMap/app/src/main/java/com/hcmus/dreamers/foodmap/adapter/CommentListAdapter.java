@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.hcmus.dreamers.foodmap.Model.Comment;
 import com.hcmus.dreamers.foodmap.R;
+import com.hcmus.dreamers.foodmap.common.TimeFormatter;
 import com.hcmus.dreamers.foodmap.event.ClickListener;
 
 import java.util.List;
@@ -42,6 +43,7 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
     public void onBindViewHolder(@NonNull ViewHolderComment viewHolderComment, int i) {
         String email = commentList.get(i).getEmailGuest();
         int imageRes = R.drawable.ic_avatar_guest_comment;
+        String date = TimeFormatter.format(commentList.get(i).getDateTime());
 
         if (email.equals("") || email.equals("null")){
             email = commentList.get(i).getEmailOwner();
@@ -51,6 +53,7 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
         viewHolderComment.igvAvatar.setImageResource(imageRes);
         viewHolderComment.txtEmail.setText(email);
         viewHolderComment.txtComment.setText(commentList.get(i).getComment());
+        viewHolderComment.txtDate.setText(date);
     }
 
 
@@ -68,6 +71,7 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
         public ImageView igvAvatar;
         public TextView txtEmail;
         public TextView txtComment;
+        public TextView txtDate;
 
         public ViewHolderComment(@NonNull View view) {
             super(view);
@@ -75,6 +79,7 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
             igvAvatar = (ImageView) view.findViewById(R.id.igv_avatar);
             txtEmail = (TextView)view.findViewById(R.id.txtEmail);
             txtComment = (TextView)view.findViewById(R.id.txtComment);
+            txtDate = view.findViewById(R.id.txtDate);
             view.setOnClickListener(this);
             view.setOnLongClickListener(this);
         }

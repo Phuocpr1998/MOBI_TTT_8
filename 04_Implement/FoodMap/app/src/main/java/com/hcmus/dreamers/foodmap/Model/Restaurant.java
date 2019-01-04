@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /*  Lớp Owner dùng để chứa thông tin của chủ quán ăn
  *
@@ -224,5 +225,18 @@ public class Restaurant implements Serializable {
 
     public void setCheck(boolean check) {
         isCheck = check;
+    }
+
+    public double getAverageRate(){
+        if (this.getRanks().isEmpty())
+        {
+            return 0D;
+        }
+
+        double averageRate = 0;
+        for(Map.Entry<String, Integer> kvp : this.getRanks().entrySet()) {
+            averageRate += kvp.getValue();
+        }
+        return averageRate / this.getRanks().size();
     }
 }

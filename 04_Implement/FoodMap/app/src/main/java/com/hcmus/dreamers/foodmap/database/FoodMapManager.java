@@ -123,7 +123,7 @@ public class FoodMapManager {
         {
             if (restaurants.get(i).getId() == id_rest)
             {
-                restaurants.get(i).setnShare(restaurants.get(i).getNum_checkin() + 1);
+                restaurants.get(i).setnShare(restaurants.get(i).getnShare() + 1);
                 return;
             }
         }

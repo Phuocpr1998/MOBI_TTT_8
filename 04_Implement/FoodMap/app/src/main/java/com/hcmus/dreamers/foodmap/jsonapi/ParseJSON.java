@@ -146,7 +146,7 @@ public class ParseJSON {
         for(int i=0;i<length;i++){
             JSONObject o = array.getJSONObject(i);
             Comment comment = new Comment();
-            comment.setDateTime(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").parse(o.getString("date_time")));
+            comment.setDateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(o.getString("date_time")));
             comment.setEmailGuest(o.getString("guest_email"));
             comment.setEmailOwner(o.getString("owner_email"));
             comment.setComment(o.getString("comment"));

@@ -6,6 +6,8 @@ import java.util.Date;
 public class TimeFormatter {
     public static final String FULL_TIME = "HH:mm:ss";
     public static final String SHORT_TIME = "HH:mm";
+    public static final String FULL_DATE = "yyyy-MM-dd HH:mm:ss";
+
     private static SimpleDateFormat timeFormatter = null;
 
     public static String format(Date date, boolean fullTime) {
@@ -29,5 +31,10 @@ public class TimeFormatter {
             e.printStackTrace();
         }
         return date;
+    }
+
+    public static String format(Date date){
+        timeFormatter = new SimpleDateFormat(FULL_DATE);
+        return timeFormatter.format(date);
     }
 }

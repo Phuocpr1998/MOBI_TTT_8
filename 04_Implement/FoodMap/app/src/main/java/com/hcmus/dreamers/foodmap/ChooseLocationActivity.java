@@ -179,12 +179,6 @@ public class ChooseLocationActivity extends AppCompatActivity implements View.On
         mLocationOverlay.setPersonIcon(iconMyLocation);
         mLocationOverlay.disableFollowLocation();
 
-        mapController.setCenter(this.mLocationOverlay.getMyLocation());
-
-
-        // thêm marker vào
-        mMap.getOverlays().add(this.mLocationOverlay);
-
         if (mLocationOverlay.getMyLocation() != null)
             restPoint = new GeoPoint(mLocationOverlay.getMyLocation().getLatitude(), mLocationOverlay.getMyLocation().getLongitude());
 
@@ -198,6 +192,9 @@ public class ChooseLocationActivity extends AppCompatActivity implements View.On
         mLocMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 100,
                 new LocationChange(mMap, mLocationOverlay, mapController));
 
+        mapController.setCenter(this.mLocationOverlay.getMyLocation());
+        // thêm marker vào
+        mMap.getOverlays().add(this.mLocationOverlay);
         //
         MapEventsReceiver mReceive = new MapEventsReceiver() {
             @Override

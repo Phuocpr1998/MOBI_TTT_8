@@ -6,6 +6,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
@@ -162,18 +164,18 @@ public class MapActivity extends AppCompatActivity{
 
         this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(MapActivity.this),mMap);
         mLocationOverlay.enableMyLocation();
-
-
-        mapController.setCenter(this.mLocationOverlay.getMyLocation());
-        mMap.getOverlays().add(this.mLocationOverlay);
+        Bitmap iconMyLocation = BitmapFactory.decodeResource(getResources(),R.drawable.ic_mylocation);
+        mLocationOverlay.setPersonIcon(iconMyLocation);
 
         mLocMgr = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        mLocMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 100,
+        mLocMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 100,
                 new LocationChange(mMap, mLocationOverlay, mapController));
 
+        mapController.setCenter(this.mLocationOverlay.getMyLocation());
+        mMap.getOverlays().add(this.mLocationOverlay);
     }
 
     private void addMarker(String title, String description, GeoPoint point){
