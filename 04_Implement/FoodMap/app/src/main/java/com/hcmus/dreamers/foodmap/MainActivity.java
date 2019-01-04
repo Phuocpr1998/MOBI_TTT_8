@@ -2,12 +2,14 @@ package com.hcmus.dreamers.foodmap;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -25,14 +27,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,6 +57,7 @@ import com.hcmus.dreamers.foodmap.Model.Owner;
 import com.hcmus.dreamers.foodmap.Model.Restaurant;
 import com.hcmus.dreamers.foodmap.adapter.PlaceAutoCompleteApdapter;
 import com.hcmus.dreamers.foodmap.common.FoodMapApiManager;
+import com.hcmus.dreamers.foodmap.common.MathUtils;
 import com.hcmus.dreamers.foodmap.database.FoodMapManager;
 import com.hcmus.dreamers.foodmap.define.ConstantCODE;
 import com.hcmus.dreamers.foodmap.define.ConstantURL;
@@ -62,13 +73,17 @@ import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
+import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -90,6 +105,34 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<OverlayItem> markers;
     private ItemizedOverlayWithFocus<OverlayItem> markerTemp;
+
+    private Button btnSearchArea;           //Nút tìm kiếm/cập nhật dữ liệu khu vực
+    private LinearLayout internalWrapper;   //layout con của HorizalScrollView, chứa các layout của phần tử restaurant
+
+    // Phục vụ việc xử lý sự kiện vuốt của HorizontalScrollView
+    private HorizontalScrollView horizontalScrollView;
+    private GestureDetector gestureDetector;
+    private static final int SWIPE_MIN_DISTANCE = 5;
+    private static final int SWIPE_THRESHOLD_VELOCITY = 300;
+    private int selectedRestaurant = 0;
+
+    // Lưu các quán ăn trong khu vực màn hình đt
+    private List<Restaurant> restaurants;
+    private int width;
+
+    // Dùng để đặt tiêu chí so sánh giữa 2 nhà hàng (khoảng cách, comment,...)
+    // mặc định sắp xếp theo khoảng cách
+    Comparator<Restaurant> restaurantComparator = new Comparator<Restaurant>() {
+        @Override
+        public int compare(Restaurant o1, Restaurant o2) {
+            double distanceToRest1, distanceToRest2;
+            distanceToRest1 = getDistanceToUser(o1.getLocation());
+            distanceToRest2 = getDistanceToUser(o2.getLocation());
+            return Double.compare(distanceToRest1, distanceToRest2);
+        }
+    };
+
+    private Marker searchReturnedMarker;
 
     @Override
     protected void onPause() {
@@ -149,6 +192,52 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Thiết lập ẩn hiện nút Tìm kiếm dữ liệu khu vực
+        btnSearchArea = findViewById(R.id.btnSearchArea);
+        btnSearchArea.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                btnSearchArea.setVisibility(View.GONE);
+                restaurants = getBoundingBoxData();     //Chuẩn bị sẵn dữ liệu, đổ dữ liệu này vào layout khi ng dùng ấn marker
+                Collections.sort(restaurants, restaurantComparator);    //Sắp xếp theo tiêu chí đã chuẩn bị sẵn
+
+                clearAllMarkers();
+                addMarkerRestaurant();
+            }
+        });
+
+        //Thiết lập sự kiến vuốt, click vào RestaurantOverview
+        gestureDetector = new GestureDetector(this, new MyGestureDetector());
+        horizontalScrollView = findViewById(R.id.horizontalScrollView);
+        horizontalScrollView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                if (gestureDetector.onTouchEvent(event)) {
+                    return true;
+                }
+                else if(event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL ){
+                    int scrollX = horizontalScrollView.getScrollX();
+                    int featureWidth = v.getMeasuredWidth();
+                    selectedRestaurant = ((scrollX + (featureWidth/2))/featureWidth);
+                    int scrollTo = selectedRestaurant*featureWidth;
+                    horizontalScrollView.smoothScrollTo(scrollTo, 0);
+                    return true;
+                } else{
+                    return false;
+                }
+            }
+        });
+
+        // Lấy chiều ngang màn hình đt thật
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        width = displayMetrics.widthPixels;
+
+        internalWrapper = findViewById(R.id.internalWrapper);
+
+        restaurants = getBoundingBoxData();         // Lấy dữ liệu lần nạp đầu tiên
+
         // thêm restaurant
         addMarkerRestaurant();
     }
@@ -206,51 +295,36 @@ public class MainActivity extends AppCompatActivity {
         mapController.setCenter(this.mLocationOverlay.getMyLocation());
         mMap.getOverlays().add(this.mLocationOverlay);
 
+        // Khi người dùng di chuyển bản đồ, hiện nút cho phép người dùng cập nhật dữ liệu
         mMap.setMapListener(new MapListener() {
             @Override
             public boolean onScroll(ScrollEvent scrollEvent) {
-                Log.w("boundingBox",mMap.getBoundingBox().toString()); // N: E: S: W:
-                List<Restaurant> restaurants = getBoundingBoxData();
-                Log.w("dataSize", String.valueOf(restaurants.size()));
+                btnSearchArea.setVisibility(View.VISIBLE);
                 return true;
             }
 
             @Override
             public boolean onZoom(ZoomEvent zoomEvent) {
-                Log.w("boundingBox",mMap.getBoundingBox().toString()); // N: E: S: W:
-                List<Restaurant> restaurants = getBoundingBoxData();
-                Log.w("dataSize", String.valueOf(restaurants.size()));
+                btnSearchArea.setVisibility(View.VISIBLE);
                 return true;
             }
         });
     }
 
-    // thêm một marker vào map
+    // thêm một marker vào map (marker từ kết quả trả về của autocomplete)
     private void addMarker(String title, String description, GeoPoint point){
-        if (markerTemp != null){
-            mMap.getOverlays().remove(markerTemp);
+        if (searchReturnedMarker != null)
+        {
+            mMap.getOverlayManager().remove(searchReturnedMarker);
         }
-        List<OverlayItem> overlayItems = new ArrayList<>();
 
-        OverlayItem marker = new OverlayItem(title, description, point);
-        overlayItems.add(marker); // Lat/Lon decimal degrees
-        // thêm sự kiện marker click
-        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(MainActivity.this, overlayItems, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
-            @Override
-            public boolean onItemSingleTapUp(int i, OverlayItem overlayItem) {
-                return false;
-            }
-
-            @Override
-            public boolean onItemLongPress(int i, OverlayItem overlayItem) {
-                return false;
-            }
-        });
-
-        markerTemp = mOverlay;
-        // thêm marker vào map
-        mMap.getOverlays().add(mOverlay);
-        mMap.invalidate();
+        searchReturnedMarker = new Marker(mMap);
+        searchReturnedMarker.setTitle(title);
+        searchReturnedMarker.setSnippet(description);
+        searchReturnedMarker.setPosition(point);
+        searchReturnedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        searchReturnedMarker.showInfoWindow();
+        mMap.getOverlayManager().add(searchReturnedMarker);
     }
 
     // sử dụng để thêm nhiều marker cùng lúc
@@ -259,13 +333,18 @@ public class MainActivity extends AppCompatActivity {
         ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(MainActivity.this, markers, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
             @Override
             public boolean onItemSingleTapUp(int i, OverlayItem overlayItem) {
-                GeoPoint point = new GeoPoint(overlayItem.getPoint().getLatitude(), overlayItem.getPoint().getLongitude());
+                GeoPoint point = (GeoPoint) overlayItem.getPoint();
                 Restaurant restaurant = FoodMapManager.findRestaurant(point);
 
                 if (restaurant != null){
-                    Intent intent = new Intent(MainActivity.this, RestaurantInfoActivity.class);
-                    intent.putExtra("restID", restaurant.getId());
-                    startActivity(intent);
+                    selectedRestaurant = restaurants.indexOf(restaurant);           //Cập nhật chỉ mục của Rest Overview
+                    Log.w("selectedItem",String.valueOf(selectedRestaurant));  //debug only
+
+                    horizontalScrollView.setVisibility(View.VISIBLE);
+                    updateRestaurantOverview();
+                    View child = internalWrapper.getChildAt(selectedRestaurant);
+                    internalWrapper.requestChildFocus(child, child);        // Di chuyển đến layout con tương ứng
+                    mapController.animateTo(point);                         // Hiệu ứng trên bản đồ
                 }
 
                 return true;
@@ -536,6 +615,7 @@ public class MainActivity extends AppCompatActivity {
                 GeoPoint point = detailAddresses.get(position).getPoint();
 
                 atclSearch.setText(address);
+                atclSearch.clearFocus();
                 addMarker(name, address, point);
                 moveCamera(point);
             }
@@ -564,7 +644,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void addMarkerRestaurant(){
-        List<Restaurant> restaurants = FoodMapManager.getRestaurants();
         if (restaurants != null) {
             for (Restaurant rest : restaurants) {
                 OverlayItem marker = new OverlayItem(rest.getName(), rest.getDescription(), rest.getLocation());
@@ -646,5 +725,113 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return result;
+    }
+
+    private void updateRestaurantOverview() {
+        //Xóa tất cả các layout con nếu có tồn tại trước
+        if (internalWrapper.getChildCount() > 0)
+        {
+            internalWrapper.removeAllViews();
+        }
+
+        for(Restaurant restaurant: restaurants){
+            final View restaurantOverview =  getLayoutInflater().inflate(R.layout.restaurant_overview, internalWrapper,false);
+            restaurantOverview.setLayoutParams(new ViewGroup.LayoutParams(width, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            // Lấy các biến đối tượng từ layout
+            ImageView ovImageRestAvatar = restaurantOverview.findViewById(R.id.ovImageRestAvatar);
+            TextView ovTxtRestName = restaurantOverview.findViewById(R.id.ovTxtRestName);
+            TextView ovRestDistance = restaurantOverview.findViewById(R.id.ovRestDistance);
+            RatingBar ovRatingbar = restaurantOverview.findViewById(R.id.ovRatingBar);
+            TextView ovTxtTotalRate = restaurantOverview.findViewById(R.id.ovTxtTotalRate);
+            TextView ovTxtTotalFavorite = restaurantOverview.findViewById(R.id.ovTxtTotalFavorite);
+            TextView ovTxtTotalComment = restaurantOverview.findViewById(R.id.ovTxtTotalComment);
+            TextView ovTxtTotalCheckin = restaurantOverview.findViewById(R.id.ovTxtTotalCheckin);
+            TextView ovTxtTotalShare = restaurantOverview.findViewById(R.id.ovTxtTotalShare);
+
+            // Nạp dữ liệu vào các Widget UI
+            DownloadImageTask task = new DownloadImageTask(ovImageRestAvatar, this);
+            task.loadImageFromUrl(restaurant.getUrlImage());
+            ovTxtRestName.setText(restaurant.getName());
+            ovRestDistance.setText(String.format("%.2f m",getDistanceToUser(restaurant.getLocation())));
+            float avgRate = MathUtils.roundToHaft(restaurant.getAverageRate());
+            ovRatingbar.setRating((float) restaurant.getAverageRate());
+            ovTxtTotalRate.setText(String.format("(%d)", restaurant.getRanks().size()));
+            ovTxtTotalFavorite.setText(String.valueOf(restaurant.getnFavorites()));
+            ovTxtTotalComment.setText(String.valueOf(restaurant.getComments().size()));
+            ovTxtTotalCheckin.setText(String.valueOf(restaurant.getNum_checkin()));
+            ovTxtTotalShare.setText(String.valueOf(restaurant.getnShare()));
+
+            internalWrapper.addView(restaurantOverview);            // Thêm layout của phần tử restaurant vào layout cha của nó *bắt buộc*
+        }
+    }
+
+    private double computeDistance(GeoPoint src, GeoPoint dest) {
+        return src.distanceToAsDouble(dest);
+    }
+
+    private double getDistanceToUser(GeoPoint src) {
+        return computeDistance(mLocationOverlay.getMyLocation(), src);
+    }
+
+    // Quản lý các sự kiện vuốt, click vào restaurant overview
+    // Vuốt ngang -> Di chuyển sang quán ăn tương ứng
+    // Vuốt trên xuống dưới -> Ẩn đi Overview
+    class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            try {
+                if (restaurants.isEmpty())
+                    return false;
+
+                //right to left
+                if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    Log.w("swipe","right to left");         //Debug only
+                    int featureWidth = horizontalScrollView.getMeasuredWidth();
+                    selectedRestaurant = (selectedRestaurant < (restaurants.size() - 1))? selectedRestaurant + 1:restaurants.size() -1;
+                    horizontalScrollView.smoothScrollTo(selectedRestaurant *featureWidth, 0);
+
+                    mapController.animateTo(restaurants.get(selectedRestaurant).getLocation());
+                    return true;
+                }
+                //left to right
+                else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    Log.w("swipe", "left to right");    //Debug only
+
+                    int featureWidth = horizontalScrollView.getMeasuredWidth();
+                    selectedRestaurant = (selectedRestaurant > 0)? selectedRestaurant - 1:0;
+                    horizontalScrollView.smoothScrollTo(selectedRestaurant *featureWidth, 0);
+
+                    mapController.animateTo(restaurants.get(selectedRestaurant).getLocation());
+                    return true;
+                }
+                // top to bottom
+                else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY)
+                {
+                    Log.w("swipe", "top to bottom");    //Debug only
+
+                    horizontalScrollView.setVisibility(View.GONE);
+                    return true;
+                }
+            } catch (Exception e) {
+                Log.e("Fling", "There was an error processing the Fling event:" + e.getMessage());
+            }
+            return false;
+        }
+
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+            Log.w("onSingleTapUp",String.valueOf(selectedRestaurant));
+            if (restaurants.isEmpty())
+                return false;
+
+            // Vào activity quán ăn
+            Restaurant restaurant = restaurants.get(selectedRestaurant);
+            Intent intent = new Intent(MainActivity.this, RestaurantInfoActivity.class);
+            intent.putExtra("restID", restaurant.getId());
+            startActivity(intent);
+            return true;
+        }
+
     }
 }
