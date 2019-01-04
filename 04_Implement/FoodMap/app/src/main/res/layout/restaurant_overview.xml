@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@android:color/white"
     android:orientation="vertical">
 
     <ImageView
@@ -53,40 +54,12 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true">
 
-            <ImageView
-                android:id="@+id/ovImgStart1"
+            <RatingBar
+                android:id="@+id/ovRatingBar"
+                style="@style/Base.Widget.AppCompat.RatingBar.Indicator"
+                android:stepSize="0.5"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
-                android:src="@drawable/star_full" />
-
-            <ImageView
-                android:id="@+id/ovImgStart2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
-                android:src="@drawable/star_full" />
-
-            <ImageView
-                android:id="@+id/ovImgStart3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
-                android:src="@drawable/star_full" />
-
-            <ImageView
-                android:id="@+id/ovImgStart4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
-                android:src="@drawable/star_full" />
-
-            <ImageView
-                android:id="@+id/ovImgStart5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
-                android:src="@drawable/star_half_empty" />
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/ovTxtTotalRate"
