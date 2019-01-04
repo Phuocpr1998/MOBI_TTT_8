@@ -4,11 +4,7 @@ include "../../private/database.php";
 
 //create class Restaurant
 class Restaurant{
-<<<<<<< HEAD:04_Implement/FoodMap_Webservices/getRestaurant.php
-	function Restaurant($id, $owner_username, $name, $address, $phone_number, $describe_text, $url_image, $time_open, $time_close, $lat, $lon, $rank, $comments, $dishs, $num_checkin){
-=======
 	function Restaurant($id, $owner_username, $name, $address, $phone_number, $describe_text, $url_image, $time_open, $time_close, $lat, $lon, $rank, $comments, $dishs,  $num_favorite, $num_checkin, $num_share){
->>>>>>> 4bd514586265c39d24087ed6bd193245f00485c1:04_Implement/FoodMap_Webservices/public_html/api/getAllRestaurant.php
 		$this->id = $id;
 		$this->owner_username= $owner_username;
 		$this->name = $name;
@@ -23,14 +19,10 @@ class Restaurant{
 		$this->ranks = $rank;
 		$this->comments = $comments;
 		$this->dishs = $dishs;
-<<<<<<< HEAD:04_Implement/FoodMap_Webservices/getRestaurant.php
-		$this->num_checkin = $num_checkin;
-=======
 		$this->num_favorite = $num_favorite;
 		$this->num_checkin = $num_checkin;
 		$this->num_share = $num_share;
 		$this->ischeck = true;
->>>>>>> 4bd514586265c39d24087ed6bd193245f00485c1:04_Implement/FoodMap_Webservices/public_html/api/getAllRestaurant.php
 	}
 }
 class Comment{
@@ -113,25 +105,14 @@ if ($listRestaurants != -1)
 		$checkin = 0;
 		if ($countCheckin != -1)
 		{
-<<<<<<< HEAD:04_Implement/FoodMap_Webservices/getRestaurant.php
-			foreach ($countCheckin as $row) {
-				$checkin = $row["COUNT"];
-=======
 			foreach ($countCheckin as $rowCheckin) {
 				$checkin = $rowCheckin["COUNT"];
 				if (is_null($checkin))
 					$checkin = 0;
->>>>>>> 4bd514586265c39d24087ed6bd193245f00485c1:04_Implement/FoodMap_Webservices/public_html/api/getAllRestaurant.php
 				break;
 			}
 		}
 
-<<<<<<< HEAD:04_Implement/FoodMap_Webservices/getRestaurant.php
-		//
-		array_push($res, new Restaurant($id_rest, $row['OWNER_USERNAME'], $row['NAME'], $row['ADDRESS'], $row['PHONE_NUMBER'], 
-			$row['DESCRIBE_TEXT'], $row['URL_IMAGE'], $row['TIMEOPEN'], $row['TIMECLOSE'],
-			$row['LAT'], $row['LON'], $ranks, $comments, $dishs, $checkin));
-=======
 		// get number share
 		$countShare = $conn->GetShare($id_rest);
 		$share = 0;
@@ -154,7 +135,6 @@ if ($listRestaurants != -1)
 		array_push($res, new Restaurant($id_rest, $row['OWNER_USERNAME'], $row['NAME'], $row['ADDRESS'], $row['PHONE_NUMBER'], 
 			$row['DESCRIBE_TEXT'], $row['URL_IMAGE'], $row['TIMEOPEN'], $row['TIMECLOSE'],
 			$row['LAT'], $row['LON'], $ranks, $comments, $dishs, $favorite, $checkin, $share));
->>>>>>> 4bd514586265c39d24087ed6bd193245f00485c1:04_Implement/FoodMap_Webservices/public_html/api/getAllRestaurant.php
 	}
 
 	$response["status"] = 200;
