@@ -205,24 +205,6 @@ public class MainActivity extends AppCompatActivity {
 
         mapController.setCenter(this.mLocationOverlay.getMyLocation());
         mMap.getOverlays().add(this.mLocationOverlay);
-
-        mMap.setMapListener(new MapListener() {
-            @Override
-            public boolean onScroll(ScrollEvent scrollEvent) {
-                Log.w("boundingBox",mMap.getBoundingBox().toString()); // N: E: S: W:
-                List<Restaurant> restaurants = getBoundingBoxData();
-                Log.w("dataSize", String.valueOf(restaurants.size()));
-                return true;
-            }
-
-            @Override
-            public boolean onZoom(ZoomEvent zoomEvent) {
-                Log.w("boundingBox",mMap.getBoundingBox().toString()); // N: E: S: W:
-                List<Restaurant> restaurants = getBoundingBoxData();
-                Log.w("dataSize", String.valueOf(restaurants.size()));
-                return true;
-            }
-        });
     }
 
     // thêm một marker vào map
@@ -613,38 +595,5 @@ public class MainActivity extends AppCompatActivity {
                 progressDialog.dismiss();
             }
         });
-    }
-
-    // Bounding Box definition:
-    // https://wiki.openstreetmap.org/wiki/Bounding_Box
-    //
-    //              ------* (North, East)
-    //              |     |
-    //              |     |
-    //(South, West) *------
-
-    // Gọi phương thức này khi lần đầu vào hoặc khi người dùng ấn nút cập nhật dữ liệu khu vực
-
-    private List<Restaurant> getBoundingBoxData(){
-        double minLat, minLon;
-        double maxLat, maxLon;
-        minLat = mMap.getBoundingBox().getLatSouth();
-        minLon = mMap.getBoundingBox().getLonWest();
-        maxLat = mMap.getBoundingBox().getLatNorth();
-        maxLon = mMap.getBoundingBox().getLonEast();
-
-        List<Restaurant> result = new ArrayList<>();
-        for (Restaurant restaurant: FoodMapManager.getRestaurants())
-        {
-            double Lat = restaurant.getLocation().getLatitude();
-            double Lon = restaurant.getLocation().getLongitude();
-
-            if ((minLat <= Lat && Lat <= maxLat) &&
-                    (minLon <= Lon && Lon <= maxLon))
-            {
-                result.add(restaurant);
-            }
-        }
-        return result;
     }
 }
