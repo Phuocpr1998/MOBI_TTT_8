@@ -224,8 +224,6 @@ public class MapActivity extends AppCompatActivity{
                 int code = (int)response;
                 if (code == ConstantCODE.NOTINTERNET){
                     Toast.makeText(MapActivity.this, "Không thể tìm được đường đi", Toast.LENGTH_LONG);
-                }
-                else {
                     moveCamera(mLocationOverlay.getMyLocation());
                 }
             }
