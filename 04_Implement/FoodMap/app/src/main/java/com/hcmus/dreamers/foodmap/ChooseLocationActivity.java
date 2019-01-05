@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -65,7 +66,7 @@ public class ChooseLocationActivity extends AppCompatActivity implements View.On
     Toolbar toolbar;
 
     private MapView mMap;
-    private MyLocationNewOverlay mLocationOverlay;
+    private LocationChange mLocation;
     private LocationManager mLocMgr;
     private IMapController mapController;
     private ArrayList<OverlayItem> markers;
@@ -73,6 +74,7 @@ public class ChooseLocationActivity extends AppCompatActivity implements View.On
 
     private List<DetailAddress> detailAddresses;
     private PlaceAutoCompleteApdapter placeAutoCompleteApdapter;
+    ItemizedOverlayWithFocus<OverlayItem> mOverlay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,10 +144,10 @@ public class ChooseLocationActivity extends AppCompatActivity implements View.On
             ChooseLocationActivity.this.finish();
         }
         else if (id == R.id.igv_mylocation) {
-            if (mLocationOverlay.getMyLocation() != null){
+            if (mLocation.getMyLocation() != null){
                 mapController.setZoom(17.0);
-                moveCamera(mLocationOverlay.getMyLocation());
-                restPoint = mLocationOverlay.getMyLocation();
+                moveCamera(mLocation.getMyLocation());
+                restPoint = mLocation.getMyLocation();
             }
         }
     }
@@ -174,14 +176,6 @@ public class ChooseLocationActivity extends AppCompatActivity implements View.On
         markers = new ArrayList<OverlayItem>();
 
         // cài đặt marker vị trí
-        this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(ChooseLocationActivity.this),mMap);
-        Bitmap iconMyLocation = BitmapFactory.decodeResource(getResources(),R.drawable.ic_mylocation);
-        mLocationOverlay.setPersonIcon(iconMyLocation);
-        mLocationOverlay.disableFollowLocation();
-
-        if (mLocationOverlay.getMyLocation() != null)
-            restPoint = new GeoPoint(mLocationOverlay.getMyLocation().getLatitude(), mLocationOverlay.getMyLocation().getLongitude());
-
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
 
@@ -189,16 +183,14 @@ public class ChooseLocationActivity extends AppCompatActivity implements View.On
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        mLocMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 100,
-                new LocationChange(mMap, mLocationOverlay, mapController));
+        mLocation =  new LocationChange(ChooseLocationActivity.this, mMap, mapController, false);
+        mLocMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocation);
 
-        mapController.setCenter(this.mLocationOverlay.getMyLocation());
-        // thêm marker vào
-        mMap.getOverlays().add(this.mLocationOverlay);
         //
         MapEventsReceiver mReceive = new MapEventsReceiver() {
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p) {
+                Log.d("MapEventsReceiver", "singleTapConfirmedHelper " + p.toString());
                 restPoint = p;
                 addMarker("You choose", "Địa chỉ bạn đã chọn", restPoint);
                 moveCamera(restPoint);
@@ -214,16 +206,22 @@ public class ChooseLocationActivity extends AppCompatActivity implements View.On
         OverlayEvents = new MapEventsOverlay(getBaseContext(), mReceive);
         mMap.getOverlays().add(OverlayEvents);
 
+        if (mLocation.getMyLocation() != null)
+            restPoint = mLocation.getMyLocation();
     }
 
     // thêm một marker vào map
     private ItemizedOverlayWithFocus<OverlayItem> addMarker(String title, String description, GeoPoint point){
         markers.clear();
+        if (mOverlay != null)
+            mMap.getOverlays().remove(mOverlay);
+
         OverlayItem marker = new OverlayItem(title, description, point);
         Drawable drawable = getResources().getDrawable(R.drawable.ic_restaurant_marker);
         marker.setMarker(drawable);
+        markers.add(marker);
         // thêm sự kiện marker click
-        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(ChooseLocationActivity.this, markers, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+        mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(ChooseLocationActivity.this, markers, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
             @Override
             public boolean onItemSingleTapUp(int i, OverlayItem overlayItem) {
                 return false;
@@ -231,29 +229,18 @@ public class ChooseLocationActivity extends AppCompatActivity implements View.On
 
             @Override
             public boolean onItemLongPress(int i, OverlayItem overlayItem) {
-                GeoPoint point = new GeoPoint(overlayItem.getPoint().getLatitude(), overlayItem.getPoint().getLongitude());
-                Restaurant restaurant = FoodMapManager.findRestaurant(point);
-
-                if (restaurant != null){
-                    Intent intent = new Intent(ChooseLocationActivity.this, RestaurantInfoActivity.class);
-                    intent.putExtra("rest", (Serializable) restaurant);
-                    startActivity(intent);
-                }
                 return false;
             }
         });
         mOverlay.setFocusItemsOnTap(true);
 
         // thêm marker vào map và chỉ một marker được tồn tại
-        mMap.getOverlays().clear();
         mMap.getOverlays().add(mOverlay);
-        mMap.getOverlays().add(mLocationOverlay);
-        mMap.getOverlays().add(OverlayEvents);
         mMap.invalidate();
         return mOverlay;
     }
     private void moveCamera(GeoPoint point){
-        mapController.animateTo(point);
+        mapController.setCenter(point);
     }
 
     //

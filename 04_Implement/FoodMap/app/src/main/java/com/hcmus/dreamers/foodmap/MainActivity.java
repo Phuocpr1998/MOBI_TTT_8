@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     private NavigationView navigationMenu;
 
     private ZoomLimitMapView mMap;
-    private MyLocationNewOverlay mLocationOverlay;
+    private LocationChange mLocation;
     private LocationManager mLocMgr;
     private IMapController mapController;
 
@@ -142,9 +142,9 @@ public class MainActivity extends AppCompatActivity {
         igvMyLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mLocationOverlay != null){
+                if (mLocation.getMyLocation() != null){
                     mapController.setZoom(17.0);
-                    moveCamera(mLocationOverlay.getMyLocation());
+                    moveCamera(mLocation.getMyLocation());
                 }
             }
         });
@@ -188,23 +188,12 @@ public class MainActivity extends AppCompatActivity {
         //list marker
         markers = new ArrayList<OverlayItem>();
 
-        // cài đặt marker vị trí
-        this.mLocationOverlay = new MyLocationNewOverlay(mMap);
-        Bitmap iconMyLocation = BitmapFactory.decodeResource(getResources(),R.drawable.ic_mylocation);
-        this.mLocationOverlay.setPersonIcon(iconMyLocation);
-        this.mLocationOverlay.enableMyLocation();
-        this.mLocationOverlay.disableFollowLocation();
-        this.mLocationOverlay.setOptionsMenuEnabled(true);
-
         mLocMgr = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        mLocMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 100,
-                new LocationChange(mMap, mLocationOverlay, mapController));
-
-        mapController.setCenter(this.mLocationOverlay.getMyLocation());
-        mMap.getOverlays().add(this.mLocationOverlay);
+        mLocation = new LocationChange(MainActivity.this, mMap, mapController, false);
+        mLocMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 100, mLocation);
     }
 
     // thêm một marker vào map
@@ -542,7 +531,6 @@ public class MainActivity extends AppCompatActivity {
 
     void clearAllMarkers(){
         mMap.getOverlays().clear();
-        mMap.getOverlays().add(this.mLocationOverlay);
     }
 
     void addMarkerRestaurant(){
