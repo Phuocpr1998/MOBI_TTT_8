@@ -13,6 +13,7 @@ public class Comment implements Serializable {
     public Comment() {
         this.emailGuest = "";
         this.emailOwner = "";
+        this.dateTime = new Date();
     }
 
     public Comment(Date dateTime, String comment, String emailGuest, String emailOwner) {
