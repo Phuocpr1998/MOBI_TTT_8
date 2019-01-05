@@ -343,7 +343,6 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.btnLogout:
                         Log.d(TAG, "onClick: btnLogout");
-                        Toast.makeText(MainActivity.this, "onClick: btnLogout", Toast.LENGTH_SHORT).show();
                         LoginManager.getInstance().logOut();
                         Guest.setInstance(null);
                         initMenuNotLogin();
