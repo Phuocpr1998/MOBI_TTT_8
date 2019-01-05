@@ -39,13 +39,15 @@
 
         <EditText
             android:id="@+id/edtComment"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="10"
-            android:singleLine="true"/>
+            android:maxLines="3"
+            android:inputType="textMultiLine"
+            android:layout_marginLeft="8dp"/>
 
         <ImageView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:id="@+id/igvComment"
