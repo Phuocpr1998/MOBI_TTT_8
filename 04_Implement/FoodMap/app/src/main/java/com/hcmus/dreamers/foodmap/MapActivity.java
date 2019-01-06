@@ -46,6 +46,7 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.TilesOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
@@ -113,6 +114,13 @@ public class MapActivity extends AppCompatActivity{
                 return;
             }
             Location location = mLocMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location == null)
+                location = mLocMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            if (location == null)
+            {
+                Toast.makeText(MapActivity.this, "Không thể lấy được vị trí hiện tại", Toast.LENGTH_LONG).show();
+                finish();
+            }
             double lat = location.getLatitude();
             double lon = location.getLongitude();
             startPoint = new GeoPoint(lat, lon);
@@ -167,6 +175,7 @@ public class MapActivity extends AppCompatActivity{
         }
         mLocation = new LocationChange(MapActivity.this, mMap, mapController, false);
         mLocMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocation);
+        mLocMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mLocation);
     }
 
     private void addMarker(String title, String description, GeoPoint point){

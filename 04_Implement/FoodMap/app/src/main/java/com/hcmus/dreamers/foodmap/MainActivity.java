@@ -193,7 +193,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         mLocation = new LocationChange(MainActivity.this, mMap, mapController, false);
-        mLocMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 100, mLocation);
+        mLocMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocation);
+        mLocMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mLocation);
     }
 
     // thêm một marker vào map

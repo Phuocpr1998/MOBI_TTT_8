@@ -185,6 +185,7 @@ public class ChooseLocationActivity extends AppCompatActivity implements View.On
         }
         mLocation =  new LocationChange(ChooseLocationActivity.this, mMap, mapController, false);
         mLocMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocation);
+        mLocMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mLocation);
 
         //
         MapEventsReceiver mReceive = new MapEventsReceiver() {
