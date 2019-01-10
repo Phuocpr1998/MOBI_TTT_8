@@ -84,7 +84,7 @@ function checkTokenForUsername($username, $token)
 	return $check;
 }
 
-function checkTokenForDiscount($id_offer, $token)
+function checkTokenForOffer($id_offer, $token)
 {
 	$strQuery = 'SELECT FC_CHECKTOKEN("'.$token.'") AS RESULT';
 
@@ -102,7 +102,7 @@ function checkTokenForDiscount($id_offer, $token)
 		break;
 	}
 
-	// kiểm tra xem discount này có thuộc về token này không
+	// kiểm tra xem offer này có thuộc về token này không
 	if ($check)
 	{
 		$username = substr($token, 32);

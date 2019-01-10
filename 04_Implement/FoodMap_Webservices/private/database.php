@@ -405,16 +405,23 @@ class database
 		return $this->query($strQuery);
 	}
 
-	// lấy ofer của nhà hàng
+	// lấy order của nhà hàng
 	public function GetOffer($id_rest)
 	{
 		$strQuery = 'SELECT DC.NAMEDISH, DC.DISCOUNT_PERCENT, OF.* FROM DISCOUNT DC JOIN OFFER OF ON DC.ID = OF.ID_DISCOUNT WHERE DC.ID_REST = '.$id_rest;
 		return $this->query($strQuery);
 	}
 
-	public function DeleteOffer($id_offer)
+	// lấy order của guest
+	public function GetOfferGuest($guest_email)
 	{
-		$strQuery = 'DELETE FROM OFFER WHERE ID = '.$id_offer;
+		$strQuery = 'SELECT DC.NAMEDISH, DC.DISCOUNT_PERCENT, OF.* FROM DISCOUNT DC JOIN OFFER OF ON DC.ID = OF.ID_DISCOUNT WHERE OF.GUEST_EMAIL = "'.$guest_email.'"';
+		return $this->query($strQuery);
+	}
+
+	public function DeleteOffer($id_offer, $guest_email)
+	{
+		$strQuery = 'UPDATE FROM OFFER SET STATUS = -2 WHERE ID = '.$id_offer.' AND GUEST_EMAIL = "'.$guest_email.'"';
 		return $this->query($strQuery);
 	}
 

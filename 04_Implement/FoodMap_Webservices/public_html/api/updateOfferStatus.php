@@ -9,7 +9,7 @@ if (isset($_POST["token"]) && isset($_POST["id_offer"]) && isset($_POST["status"
 	$id_offer = $_POST["id_offer"];
 	$status = $_POST["status"];
 
-	$check = checkTokenForDiscount($id_offer, $token);
+	$check = checkTokenForOffer($id_offer, $token);
 	if ($check)
 	{
 		$conn = new database();
