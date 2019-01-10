@@ -149,25 +149,8 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final Offer offer = (Offer) offersAdapter.get(position);
-                        FoodMapApiManager.deleteOffer(offer.getId(), new TaskCompleteCallBack() {
-                            @Override
-                            public void OnTaskComplete(Object response) {
-                                if((int)response == ConstantCODE.SUCCESS){
-                                    Offer o = offersAdapter.get(position);
-                                    int index = offers.indexOf(o);
-                                    offers.remove(index);
-                                    offersAdapter.remove(position);
-                                    adapter.notifyDataSetChanged();
-                                    Toast.makeText(context, "Xóa Đơn hàng thành công!", Toast.LENGTH_SHORT).show();
-                                }else if((int) response == ConstantCODE.NOTFOUND){
-                                    Toast.makeText(context, "Lỗi xóa Đơn hàng không tồn tại, xin kiểm tra lại!", Toast.LENGTH_SHORT).show();
-                                }else{
-                                    Toast.makeText(context, "Không có kết nối internet, xin kiểm tra lại!", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
+                        Toast.makeText(context, "Debug", Toast.LENGTH_LONG).show();
                     }
-
                 })
                 .setNegativeButton("Không", null)
                 .show();

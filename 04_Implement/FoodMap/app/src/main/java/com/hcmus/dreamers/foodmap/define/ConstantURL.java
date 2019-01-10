@@ -23,6 +23,7 @@ public interface ConstantURL {
     public static final String CHECKCODE                   = "resetPassword.php";
     public static final String GETCATALOG                  = "getCatalog.php";
     public static final String GETOFFER                    = "getOffer.php";
+    public static final String GETGUESTOFFER               = "getOfferGuest.php";
     public static final String GETDISCOUNT                 = "getDiscount.php";
     public static final String ADDOFFER                    = "addOffer.php";
     public static final String ADDGUEST                    = "addGuest.php";
@@ -42,7 +43,7 @@ public interface ConstantURL {
     public static final String ADDSHARE                    = "addShare.php";
 	public static final String CREATEDISCOUNT              = "createDiscount.php";
     public static final String DELETEDISCOUNT              = "deleteDiscount.php";
-	public static final String DELETEOFFER                 = "deleteOffer.php";
+    public static final String DELETEOFFER                 = "deleteOffer.php";
     public static final String NOMINATIM_REVERSE = "https://nominatim.openstreetmap.org/reverse";
     public static final String UPDATESTATUS = "updateOfferStatus.php";
 }

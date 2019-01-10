@@ -6,6 +6,10 @@
             android:icon="@drawable/ic_favorite"
             android:title="Quán ăn yêu thích" />
         <item
+            android:id="@+id/btnOrder"
+            android:icon="@drawable/ic_order_manage"
+            android:title="Quản lý đơn hàng" />
+        <item
             android:id="@+id/btnUpdate"
             android:icon="@drawable/ic_update"
             android:title="Cập nhật dữ liệu" />

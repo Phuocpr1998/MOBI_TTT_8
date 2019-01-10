@@ -333,6 +333,11 @@ public class MainActivity extends AppCompatActivity {
                         Intent intent = new Intent(MainActivity.this, FavoriteRestaurantsActivity.class);
                         startActivity(intent);
                         break;
+                    case R.id.btnOrder:
+                        Log.d(TAG, "onClick: btnOrder");
+                        intent = new Intent(MainActivity.this, OrderManagerActivity.class);
+                        startActivity(intent);
+                        break;
                     case  R.id.btnFeedBack:
                         Log.d(TAG, "onClick: btnFeedBack");
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantURL.LINKFORM));

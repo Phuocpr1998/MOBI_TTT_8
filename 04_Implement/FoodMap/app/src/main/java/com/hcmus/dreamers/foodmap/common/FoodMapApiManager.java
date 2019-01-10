@@ -1044,7 +1044,7 @@ public class FoodMapApiManager {
         taskRequest.execute(new DoingTask(GenerateRequest.addOffer(offer.getGuestEmail(), offer.getTotal(), id_discount)));
     }
 
-    public static void deleteOffer(int idOffer, final TaskCompleteCallBack taskCompleteCallBack){
+    public static void deleteOffer(int idOffer, String guest_email, final TaskCompleteCallBack taskCompleteCallBack){
         TaskRequest taskRequest = new TaskRequest();
 
         taskRequest.setOnCompleteCallBack(new TaskCompleteCallBack() {
@@ -1069,10 +1069,10 @@ public class FoodMapApiManager {
                 }
             }
         });
-        taskRequest.execute(new DoingTask(GenerateRequest.deleteOffer(idOffer)));
+        taskRequest.execute(new DoingTask(GenerateRequest.deleteOffer(idOffer, guest_email)));
     }
-	
-	    public static void createDiscount(final Discount discount, final TaskCompleteCallBack taskCompleteCallBack){
+
+	public static void createDiscount(final Discount discount, final TaskCompleteCallBack taskCompleteCallBack){
         TaskRequest taskRequest = new TaskRequest();
 
         taskRequest.setOnCompleteCallBack(new TaskCompleteCallBack() {
@@ -1203,6 +1203,37 @@ public class FoodMapApiManager {
             }
         });
         taskRequest.execute(new DoingTask(GenerateRequest.updateLocation(id_rest, location, Owner.getInstance().getToken())));
+    }
+
+    public static void getOrdersGuest(String guest_email, TaskCompleteCallBack taskCompleteCallBack){
+        TaskRequest taskRequest = new TaskRequest();
+        taskRequest.setOnCompleteCallBack(new TaskCompleteCallBack() {
+            @Override
+            public void OnTaskComplete(Object response) {
+                String resultJson = response.toString();
+                ResponseJSON responseJSON = ParseJSON.fromStringToResponeJSON(resultJson);
+                if (responseJSON.getCode() == ConstantCODE.SUCCESS)
+                {
+                    Guest.getInstance().getOfferList().clear();
+                    try {
+                        Guest.getInstance().getOfferList().addAll(ParseJSON.parseOffer(resultJson));
+                        taskCompleteCallBack.OnTaskComplete(SUCCESS);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        taskCompleteCallBack.OnTaskComplete(PARSE_FAIL);
+                    }
+                }
+                else if (responseJSON.getCode() == ConstantCODE.NOTINTERNET)
+                {
+                    taskCompleteCallBack.OnTaskComplete(ConstantCODE.NOTINTERNET);
+                }
+                else
+                {
+                    taskCompleteCallBack.OnTaskComplete(FAIL_INFO);
+                }
+            }
+        });
+        taskRequest.execute(new DoingTask(GenerateRequest.getOfferGuest(guest_email)));
     }
 }
 

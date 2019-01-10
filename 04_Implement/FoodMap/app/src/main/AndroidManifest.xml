@@ -46,7 +46,8 @@
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name" />
-        <activity android:name=".LoadingActivity"
+        <activity
+            android:name=".LoadingActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -55,84 +56,103 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RestaurantInfoActivity"
+        <activity
+            android:name=".RestaurantInfoActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".LoginOwnerActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".LoginOwnerActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".LoginGuestActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".LoginGuestActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MainActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".CommentActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".CommentActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".RegisterRestaurantActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".RegisterRestaurantActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".AddDishActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AddDishActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-		<activity android:name=".AddDiscountActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AddDiscountActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-		<activity android:name=".DiscountListInfoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".DiscountListInfoActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".AddOrderActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AddOrderActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".EditDishActivity"
+            android:configChanges="orientation"
             android:label="@string/title_activity_manage_dish"
             android:parentActivityName=".EditRestaurantActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".EditRestaurantActivity"
-            android:label="@string/title_activity_manage_restaurant"
-            android:screenOrientation="portrait"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:parentActivityName=".RestaurantManageActivity" />
-        <activity android:name=".RegisterOwnerActivity"
+            android:label="@string/title_activity_manage_restaurant"
+            android:parentActivityName=".RestaurantManageActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".RegisterOwnerActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".FavoriteRestaurantsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".FavoriteRestaurantsActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ManageAccountActivity"
+            android:configChanges="orientation"
             android:label="@string/title_activity_manage_account"
             android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ChooseLocationActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ChooseLocationActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".CheckInActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".CheckInActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".RestaurantManageActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".RestaurantManageActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MapActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".MapActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".OrderListActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".OrderListActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
 
         <service android:name=".service.OrderService" />
 
-        <activity android:name=".DishDetailActivity"
+        <activity
+            android:name=".DishDetailActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
+        <activity android:name=".OrderManagerActivity"></activity>
     </application>
 
 </manifest>

@@ -45,7 +45,6 @@ public class OrderListActivity extends AppCompatActivity {
         mMonth = c.get(Calendar.MONTH);
         mDay = c.get(Calendar.DAY_OF_MONTH);
         refreshData( mYear, mMonth, mDay);
-
     }
 
     @Override
@@ -53,21 +52,9 @@ public class OrderListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_list);
         refferences();
-        //getItentFromActivity();
-        //must not remove
-        //refreshData();
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-//        offers = new ArrayList<>();
-//        for (int i = 0; i < 20; i++)
-//            offers.add(new Offer("Phở " + i, 10, "chauhoangphuc@gmail.com", i));
-//
-//
-//        adapter = new OrderListAdapter(OrderListActivity.this, R.layout.order_item_list, offers);
-//        listOffer.setAdapter(adapter);
-
     }
 
     @Override
@@ -122,5 +109,4 @@ public class OrderListActivity extends AppCompatActivity {
             adapter.setOffers(offers);
         }
     }
-
 }

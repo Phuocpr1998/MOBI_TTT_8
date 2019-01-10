@@ -383,22 +383,22 @@ public class DBManager extends SQLiteOpenHelper {
 
     public Catalog getCatalog(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Catalog catalog;
+        Catalog catalog = null;
 
         Cursor cursor = db.query(TABLE_CATALOGS, null, KEY_ID + " = ?", new String[] {String.valueOf(id)},
                 null, null, null);
         if (cursor == null)
             return null;
-        cursor.moveToFirst();
-
-        catalog = new Catalog(cursor.getInt(cursor.getColumnIndex(KEY_ID)),
-                cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+        if (cursor.moveToFirst())
+        {
+            catalog = new Catalog(cursor.getInt(cursor.getColumnIndex(KEY_ID)),
+                    cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+        }
 
         cursor.close();
         db.close();
 
         return catalog;
-
     }
 
     public List<Catalog> getAllCatalog() {
@@ -408,7 +408,6 @@ public class DBManager extends SQLiteOpenHelper {
         Cursor cursor = db.query(TABLE_CATALOGS, null, null, null, null,null, KEY_ID);
         if (cursor == null)
             return null;
-        cursor.moveToFirst();
 
         if (cursor.moveToFirst())
         {

@@ -12,9 +12,14 @@ public class Guest extends com.hcmus.dreamers.foodmap.Model.User {
 
     private List<Restaurant> favRestaurant;
 
+
+
+    private List<Offer> offerList;
+
     private Guest() {
         super();
         favRestaurant = new ArrayList<Restaurant>();
+        offerList = new ArrayList<>();
     }
 
     public List<Restaurant> getFavRestaurant() {
@@ -23,6 +28,14 @@ public class Guest extends com.hcmus.dreamers.foodmap.Model.User {
 
     public void setFavRestaurant(List<Restaurant> favRestaurant) {
         this.favRestaurant = favRestaurant;
+    }
+
+    public List<Offer> getOfferList() {
+        return offerList;
+    }
+
+    public void setOfferList(List<Offer> offerList) {
+        this.offerList = offerList;
     }
 
     private Guest(String name, String email) {
