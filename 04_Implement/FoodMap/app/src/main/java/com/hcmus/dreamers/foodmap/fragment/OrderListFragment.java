@@ -135,21 +135,37 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-        showConfirmDeleteDialog(position);
+        showConfirmDenyDialog(position);
         return true;
     }
 
 
-    private void showConfirmDeleteDialog(final int position) {
+    private void showConfirmDenyDialog(final int position) {
         new AlertDialog.Builder(context)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Xóa Đơn hàng")
-                .setMessage("Bạn có muốn xóa đơn hàng này?")
+                .setTitle("Từ chối đơn hàng")
+                .setMessage("Bạn có muốn từ chối hàng này?")
                 .setPositiveButton("Có", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final Offer offer = (Offer) offersAdapter.get(position);
-                        Toast.makeText(context, "Debug", Toast.LENGTH_LONG).show();
+                        FoodMapApiManager.updateStatusOrder(offer.getId(), -1, new TaskCompleteCallBack() {
+                            @Override
+                            public void OnTaskComplete(Object response) {
+                                if ((int) response == ConstantCODE.SUCCESS) {
+                                    Offer o = offersAdapter.get(position);
+                                    int index = offers.indexOf(o);
+                                    offersAdapter.get(position).setStatus(-1);
+                                    offers.get(index).setStatus(-1);
+                                    adapter.notifyDataSetChanged();
+                                    Toast.makeText(context, "Cập nhật đơn hàng thành công!", Toast.LENGTH_SHORT).show();
+                                } else if ((int) response == ConstantCODE.NOTFOUND) {
+                                    Toast.makeText(context, "Lỗi cập nhật đơn hàng không tồn tại, xin kiểm tra lại!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(context, "Không có kết nối internet, xin kiểm tra lại!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
                     }
                 })
                 .setNegativeButton("Không", null)

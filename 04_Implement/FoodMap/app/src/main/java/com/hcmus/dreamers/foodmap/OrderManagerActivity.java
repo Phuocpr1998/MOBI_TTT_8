@@ -44,9 +44,9 @@ public class OrderManagerActivity extends AppCompatActivity {
         offerList = Guest.getInstance().getOfferList();
         orderListAdapter = new OrderListAdapter(OrderManagerActivity.this, R.layout.order_item_list, offerList);
         lstOrders.setAdapter(orderListAdapter);
-        lstOrders.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        lstOrders.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 OrderManagerActivity.this.position = position;
 
                 // show popup menu
@@ -60,20 +60,20 @@ public class OrderManagerActivity extends AppCompatActivity {
                         {
                             new AlertDialog.Builder(OrderManagerActivity.this)
                                     .setIcon(android.R.drawable.ic_dialog_alert)
-                                    .setTitle("Xóa Đơn hàng")
-                                    .setMessage("Bạn có muốn xóa đơn hàng này?")
+                                    .setTitle("Hủy đơn hàng")
+                                    .setMessage("Bạn có muốn hủy đơn hàng này?")
                                     .setPositiveButton("Có", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            final Offer offer = (Offer) offerList.get(position);
+                                            final Offer offer = (Offer) offerList.get(OrderManagerActivity.this.position);
                                             FoodMapApiManager.deleteOffer(offer.getId(), Guest.getInstance().getEmail(), new TaskCompleteCallBack() {
                                                 @Override
                                                 public void OnTaskComplete(Object response) {
                                                     if((int)response == ConstantCODE.SUCCESS){
-                                                        Toast.makeText(OrderManagerActivity.this, "Xóa Đơn hàng thành công!", Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(OrderManagerActivity.this, "Hủy đơn hàng thành công!", Toast.LENGTH_SHORT).show();
                                                         loadData();
                                                     }else if((int) response == ConstantCODE.NOTFOUND){
-                                                        Toast.makeText(OrderManagerActivity.this, "Lỗi xóa Đơn hàng không tồn tại, xin kiểm tra lại!", Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(OrderManagerActivity.this, "Đơn hàng không tồn tại, xin kiểm tra lại!", Toast.LENGTH_SHORT).show();
                                                     }else{
                                                         Toast.makeText(OrderManagerActivity.this, "Không có kết nối internet, xin kiểm tra lại!", Toast.LENGTH_SHORT).show();
                                                     }
@@ -88,11 +88,6 @@ public class OrderManagerActivity extends AppCompatActivity {
                     }
                 });
                 popupMenu.show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
 
