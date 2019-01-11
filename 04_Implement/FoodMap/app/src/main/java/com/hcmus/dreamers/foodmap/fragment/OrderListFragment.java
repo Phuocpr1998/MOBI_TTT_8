@@ -152,9 +152,15 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final Offer offer = (Offer) offersAdapter.get(position);
+                        ProgressDialog progressDialog = new ProgressDialog(context);
+                        progressDialog.setCanceledOnTouchOutside(false);
+                        progressDialog.setMessage("Processing...");
+                        progressDialog.show();
+
                         FoodMapApiManager.updateStatusOrder(offer.getId(), -1, new TaskCompleteCallBack() {
                             @Override
                             public void OnTaskComplete(Object response) {
+                                progressDialog.dismiss();
                                 if ((int) response == ConstantCODE.SUCCESS) {
                                     Offer o = offersAdapter.get(position);
                                     int index = offers.indexOf(o);
@@ -184,10 +190,15 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final Offer offer = (Offer) offersAdapter.get(position);
+                        ProgressDialog progressDialog = new ProgressDialog(context);
+                        progressDialog.setCanceledOnTouchOutside(false);
+                        progressDialog.setMessage("Processing...");
+                        progressDialog.show();
                         int status = 1;
                         FoodMapApiManager.updateStatusOrder(offer.getId(), status, new TaskCompleteCallBack() {
                             @Override
                             public void OnTaskComplete(Object response) {
+                                progressDialog.dismiss();
                                 if ((int) response == ConstantCODE.SUCCESS) {
                                     Offer o = offersAdapter.get(position);
                                     int index = offers.indexOf(o);
@@ -268,7 +279,7 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
         OrderListFragment.this.position = position;
         // show popup menu
         PopupMenu popupMenu = new PopupMenu(context, view);
-        popupMenu.inflate(R.menu.popup_menu_order_manage);
+        popupMenu.inflate(R.menu.popup_menu_order_manage_owner);
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {

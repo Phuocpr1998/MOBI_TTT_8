@@ -50,6 +50,10 @@ public class OrderManagerActivity extends AppCompatActivity {
                 OrderManagerActivity.this.position = position;
                 if (offerList.get(position).getStatus() == -2) // không thể hủy các đơn hàng đã hủy trước đó
                     return;
+                if (offerList.get(position).getStatus() == 1){ // không thể hủy các đơn hàng đã được xử lý
+                    Toast.makeText(OrderManagerActivity.this, "Không thể hủy đơn hàng đã được xử lý", Toast.LENGTH_LONG).show();
+                    return;
+                }
 
                 // show popup menu
                 PopupMenu popupMenu = new PopupMenu(OrderManagerActivity.this, view);
@@ -68,24 +72,27 @@ public class OrderManagerActivity extends AppCompatActivity {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             final Offer offer = (Offer) offerList.get(OrderManagerActivity.this.position);
-                                            if (offer.getStatus() != 1){ // không thể hủy các đơn hàng đã được xử lý
-                                                FoodMapApiManager.deleteOffer(offer.getId(), Guest.getInstance().getEmail(), new TaskCompleteCallBack() {
-                                                    @Override
-                                                    public void OnTaskComplete(Object response) {
-                                                        if((int)response == ConstantCODE.SUCCESS){
-                                                            Toast.makeText(OrderManagerActivity.this, "Hủy đơn hàng thành công!", Toast.LENGTH_SHORT).show();
-                                                            loadData();
-                                                        }else if((int) response == ConstantCODE.NOTFOUND){
-                                                            Toast.makeText(OrderManagerActivity.this, "Đơn hàng không tồn tại, xin kiểm tra lại!", Toast.LENGTH_SHORT).show();
-                                                        }else{
-                                                            Toast.makeText(OrderManagerActivity.this, "Không có kết nối internet, xin kiểm tra lại!", Toast.LENGTH_SHORT).show();
-                                                        }
+                                            ProgressDialog progressDialog = new ProgressDialog(OrderManagerActivity.this);
+                                            progressDialog.setCanceledOnTouchOutside(false);
+                                            progressDialog.setMessage("Processing...");
+                                            progressDialog.show();
+
+
+                                            FoodMapApiManager.deleteOffer(offer.getId(), Guest.getInstance().getEmail(), new TaskCompleteCallBack() {
+                                                @Override
+                                                public void OnTaskComplete(Object response) {
+                                                    progressDialog.dismiss();
+                                                    if((int)response == ConstantCODE.SUCCESS){
+                                                        Toast.makeText(OrderManagerActivity.this, "Hủy đơn hàng thành công!", Toast.LENGTH_SHORT).show();
+                                                        loadData();
+                                                    }else if((int) response == ConstantCODE.NOTFOUND){
+                                                        Toast.makeText(OrderManagerActivity.this, "Đơn hàng không tồn tại, xin kiểm tra lại!", Toast.LENGTH_SHORT).show();
+                                                    }else{
+                                                        Toast.makeText(OrderManagerActivity.this, "Không có kết nối internet, xin kiểm tra lại!", Toast.LENGTH_SHORT).show();
                                                     }
-                                                });
-                                            }
-                                            else {
-                                                Toast.makeText(OrderManagerActivity.this, "Không thể hủy đơn hàng đã được xử lý", Toast.LENGTH_LONG).show();
-                                            }
+                                                }
+                                            });
+
                                         }
                                     })
                                     .setNegativeButton("Không", null)
