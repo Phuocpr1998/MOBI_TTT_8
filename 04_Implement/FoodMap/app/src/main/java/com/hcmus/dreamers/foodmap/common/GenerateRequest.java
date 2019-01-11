@@ -417,10 +417,11 @@ public class GenerateRequest {
         return request;
     }
 
-    public static okhttp3.Request getOffer(int id_rest) {
+    public static okhttp3.Request getOffer(int id_rest, String token) {
         String baseUrl = ConstantURL.BASEURL + ConstantURL.GETOFFER;
         Map<String, String> params = new HashMap<>();
         params.put("id_rest", String.valueOf(id_rest));
+        params.put("token", token);
         String url = Utils.buildUrl(baseUrl, params);
         okhttp3.Request request = new okhttp3.Request.Builder()
                 .url(url)

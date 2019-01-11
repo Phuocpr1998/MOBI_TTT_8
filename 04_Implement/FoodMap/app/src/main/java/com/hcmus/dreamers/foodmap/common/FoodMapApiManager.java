@@ -891,7 +891,7 @@ public class FoodMapApiManager {
             }
         });
 
-        taskRequest.execute(new DoingTask(GenerateRequest.getOffer(id_rest)));
+        taskRequest.execute(new DoingTask(GenerateRequest.getOffer(id_rest, Owner.getInstance().getToken())));
     }
 
 
