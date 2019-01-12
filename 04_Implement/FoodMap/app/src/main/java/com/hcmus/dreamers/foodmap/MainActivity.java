@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
@@ -195,6 +196,17 @@ public class MainActivity extends AppCompatActivity {
         mLocation = new LocationChange(MainActivity.this, mMap, mapController, false);
         mLocMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocation);
         mLocMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mLocation);
+
+        // get last location
+        Location location = mLocMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (location == null){
+            location = mLocMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        }
+
+        if (location != null){
+            GeoPoint point = new GeoPoint(location.getLatitude(), location.getLongitude());
+            mLocation.addMarker(point);
+        }
     }
 
     // thêm một marker vào map

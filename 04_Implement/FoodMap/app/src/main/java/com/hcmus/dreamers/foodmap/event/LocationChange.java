@@ -43,6 +43,10 @@ public class LocationChange implements LocationListener {
         double mLongtitude = location.getLongitude();
 
         point = new GeoPoint(mLatitude, mLongtitude);
+        addMarker(point);
+    }
+
+    public void addMarker(GeoPoint point){
         ArrayList arr = new ArrayList<>();
         OverlayItem marker = new OverlayItem("", "", point);
         Drawable drawable = context.getResources().getDrawable(R.drawable.ic_mylocation);
