@@ -72,6 +72,8 @@ public class OrderListAdapter extends ArrayAdapter<Offer>{
         } else if (offer.getStatus() == -2){
             status.setText("Đơn hàng đã bị hủy");
             status.setTextColor(Color.rgb(153, 0, 153));
+        } else {
+            status.setText("Không xác định"); // no exec
         }
         return view;
     }

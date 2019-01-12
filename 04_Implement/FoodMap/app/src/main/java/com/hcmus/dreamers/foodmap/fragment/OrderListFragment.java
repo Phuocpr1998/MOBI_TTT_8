@@ -83,6 +83,7 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
         mMonth = c.get(Calendar.MONTH);
         mDay = c.get(Calendar.DAY_OF_MONTH);
         refreshData(true, mYear, mMonth, mDay);
+        Log.d("OrderListFragment","onResume");
     }
 
     @Override
@@ -106,6 +107,10 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
         listOffer = rootLayout.findViewById(R.id.list_order);
         listOffer.setOnItemLongClickListener(this);
         listOffer.setOnItemClickListener(this);
+        offersAdapter = new ArrayList<>();
+        offers = new ArrayList<>();
+        adapter = new OrderListAdapter(context, R.layout.order_item_list, offersAdapter);
+        listOffer.setAdapter(adapter);
     }
 
 
@@ -114,13 +119,13 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
             @Override
             public void OnTaskComplete(Object response) {
                 String resp = response.toString();
+                Log.d("onTaskComplete", resp);
                 try {
                     ResponseJSON responseJSON = ParseJSON.parseFromAllResponse(resp);
                     if(responseJSON.getCode() == ConstantCODE.SUCCESS){
                         offers = ParseJSON.parseOffer(resp);
-                        offersAdapter = new ArrayList<>(offers);
-                        adapter = new OrderListAdapter(context, R.layout.order_item_list, offersAdapter);
-                        listOffer.setAdapter(adapter);
+                        offersAdapter.clear();
+                        offersAdapter.addAll(offers);
                         if(filter){
                             filter(year, monthOfYear, dayOfMonth);
                         }
@@ -232,8 +237,8 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
         switch (id){
             case R.id.action_GroupByNone:
                 c = Calendar.getInstance();
-                offersAdapter = new ArrayList<>(offers);
-                adapter.setOffers(offersAdapter);
+                offersAdapter.clear();
+                offersAdapter.addAll(offers);
                 adapter.notifyDataSetChanged();
             return true;
 
@@ -259,15 +264,14 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
             default:
                 return super.onOptionsItemSelected(item);
         }
-
     }
 
     private void filter(int year,int monthOfYear,int dayOfMonth){
         Date date = new GregorianCalendar(year, monthOfYear, dayOfMonth).getTime();
         c.set(year, monthOfYear, dayOfMonth);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            offersAdapter = offers.stream().filter(o -> o.compareDateOrder(date)).collect(Collectors.toList());
-            adapter.setOffers(offersAdapter);
+            offersAdapter.clear();
+            offersAdapter.addAll(offers.stream().filter(o -> o.compareDateOrder(date)).collect(Collectors.toList()));
         }
     }
 
