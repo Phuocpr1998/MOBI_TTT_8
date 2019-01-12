@@ -50,7 +50,6 @@ public class LoadingActivity extends AppCompatActivity {
                             }
                         }
                     });
-
                 }
                 else if (code == ConstantCODE.NOTINTERNET){
                     getDataLocal("Kiểm tra kết nối internet");
@@ -143,6 +142,4 @@ public class LoadingActivity extends AppCompatActivity {
             }
         });
     }
-
-
 }

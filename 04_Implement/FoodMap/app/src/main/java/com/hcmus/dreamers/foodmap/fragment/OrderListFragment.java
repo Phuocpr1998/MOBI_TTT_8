@@ -20,11 +20,14 @@ import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.hcmus.dreamers.foodmap.AsyncTask.TaskCompleteCallBack;
+import com.hcmus.dreamers.foodmap.Model.Guest;
 import com.hcmus.dreamers.foodmap.Model.Offer;
 import com.hcmus.dreamers.foodmap.Model.Restaurant;
+import com.hcmus.dreamers.foodmap.OrderManagerActivity;
 import com.hcmus.dreamers.foodmap.R;
 import com.hcmus.dreamers.foodmap.adapter.OrderListAdapter;
 import com.hcmus.dreamers.foodmap.common.FoodMapApiManager;
@@ -50,6 +53,7 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
     private static final String TAG = "OrderListFragment";
 
     private ListView listOffer;
+    private int position;
     private OrderListAdapter adapter;
     private List<Offer> offers, offersAdapter;
     private int id_rest;
@@ -135,39 +139,43 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-        showConfirmDeleteDialog(position);
         return true;
     }
 
 
-    private void showConfirmDeleteDialog(final int position) {
+    private void showConfirmDenyDialog(final int position) {
         new AlertDialog.Builder(context)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Xóa Đơn hàng")
-                .setMessage("Bạn có muốn xóa đơn hàng này?")
+                .setTitle("Từ chối đơn hàng")
+                .setMessage("Bạn có muốn từ chối hàng này?")
                 .setPositiveButton("Có", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final Offer offer = (Offer) offersAdapter.get(position);
-                        FoodMapApiManager.deleteOffer(offer.getId(), new TaskCompleteCallBack() {
+                        ProgressDialog progressDialog = new ProgressDialog(context);
+                        progressDialog.setCanceledOnTouchOutside(false);
+                        progressDialog.setMessage("Processing...");
+                        progressDialog.show();
+
+                        FoodMapApiManager.updateStatusOrder(offer.getId(), -1, new TaskCompleteCallBack() {
                             @Override
                             public void OnTaskComplete(Object response) {
-                                if((int)response == ConstantCODE.SUCCESS){
+                                progressDialog.dismiss();
+                                if ((int) response == ConstantCODE.SUCCESS) {
                                     Offer o = offersAdapter.get(position);
                                     int index = offers.indexOf(o);
-                                    offers.remove(index);
-                                    offersAdapter.remove(position);
+                                    offersAdapter.get(position).setStatus(-1);
+                                    offers.get(index).setStatus(-1);
                                     adapter.notifyDataSetChanged();
-                                    Toast.makeText(context, "Xóa Đơn hàng thành công!", Toast.LENGTH_SHORT).show();
-                                }else if((int) response == ConstantCODE.NOTFOUND){
-                                    Toast.makeText(context, "Lỗi xóa Đơn hàng không tồn tại, xin kiểm tra lại!", Toast.LENGTH_SHORT).show();
-                                }else{
+                                    Toast.makeText(context, "Cập nhật đơn hàng thành công!", Toast.LENGTH_SHORT).show();
+                                } else if ((int) response == ConstantCODE.NOTFOUND) {
+                                    Toast.makeText(context, "Lỗi cập nhật đơn hàng không tồn tại, xin kiểm tra lại!", Toast.LENGTH_SHORT).show();
+                                } else {
                                     Toast.makeText(context, "Không có kết nối internet, xin kiểm tra lại!", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
                     }
-
                 })
                 .setNegativeButton("Không", null)
                 .show();
@@ -176,16 +184,21 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
     private void showConfirmProcessDialog(final int position) {
         new AlertDialog.Builder(context)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Thay đổi trạng thái")
-                .setMessage("Bạn có muốn thay đổi trạng thái đơn hàng này?")
+                .setTitle("Chấp nhận đơn hàng")
+                .setMessage("Bạn có muốn chấp nhận đơn hàng này?")
                 .setPositiveButton("Có", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final Offer offer = (Offer) offersAdapter.get(position);
-                        int status = offer.getStatus() == 1 ? 0 : 1;
+                        ProgressDialog progressDialog = new ProgressDialog(context);
+                        progressDialog.setCanceledOnTouchOutside(false);
+                        progressDialog.setMessage("Processing...");
+                        progressDialog.show();
+                        int status = 1;
                         FoodMapApiManager.updateStatusOrder(offer.getId(), status, new TaskCompleteCallBack() {
                             @Override
                             public void OnTaskComplete(Object response) {
+                                progressDialog.dismiss();
                                 if ((int) response == ConstantCODE.SUCCESS) {
                                     Offer o = offersAdapter.get(position);
                                     int index = offers.indexOf(o);
@@ -260,6 +273,26 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        showConfirmProcessDialog(position);
+        if (offersAdapter.get(position).getStatus() == 1) // các đơn hàng đã xử lý sẽ không được chỉnh sửa
+            return;
+
+        OrderListFragment.this.position = position;
+        // show popup menu
+        PopupMenu popupMenu = new PopupMenu(context, view);
+        popupMenu.inflate(R.menu.popup_menu_order_manage_owner);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                popupMenu.dismiss();
+                if (item.getItemId() == R.id.btnAcceptOrder){
+                    showConfirmProcessDialog(OrderListFragment.this.position);
+                }
+                else if (item.getItemId() == R.id.btnDenyOrder){
+                    showConfirmDenyDialog(OrderListFragment.this.position);
+                }
+                return false;
+            }
+        });
+        popupMenu.show();
     }
 }

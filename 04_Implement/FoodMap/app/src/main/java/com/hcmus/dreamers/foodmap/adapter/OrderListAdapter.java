@@ -63,9 +63,15 @@ public class OrderListAdapter extends ArrayAdapter<Offer>{
         if(offer.getStatus() == 0){
             status.setText("Chưa được xử lí");
             status.setTextColor(Color.RED);
-        }else{
+        }else if (offer.getStatus() == 1){
             status.setText("Đã được xử lí");
             status.setTextColor(Color.rgb(0, 255, 196));
+        } else if (offer.getStatus() == -1){
+            status.setText("Đơn hàng bị từ chối");
+            status.setTextColor(Color.rgb(153, 0, 0));
+        } else if (offer.getStatus() == -2){
+            status.setText("Đơn hàng đã bị hủy");
+            status.setTextColor(Color.rgb(153, 0, 153));
         }
         return view;
     }

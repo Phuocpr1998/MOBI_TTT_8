@@ -1,38 +1,75 @@
 package com.hcmus.dreamers.foodmap.event;
 
+import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.util.Log;
+
+import com.hcmus.dreamers.foodmap.R;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
+import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+
+import java.util.ArrayList;
 
 public class LocationChange implements LocationListener {
 
     private MapView mMap;
-    private MyLocationNewOverlay mLocationOverlay;
+    private ItemizedOverlayWithFocus<OverlayItem> mLocationOverlay;
+    private GeoPoint point;
     private IMapController mapController;
+    private Context context;
+    private boolean isFollow;
 
-    public LocationChange(MapView mMap, MyLocationNewOverlay mLocationOverlay, IMapController mapController) {
+    public LocationChange(Context context, MapView mMap, IMapController mapController, boolean isFollow) {
         this.mMap = mMap;
-        this.mLocationOverlay = mLocationOverlay;
         this.mapController = mapController;
+        this.context = context;
+        this.isFollow = isFollow;
+        mLocationOverlay = null;
     }
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.d("LocationChange", "onLocationChanged " + location.toString());
         double mLatitude = location.getLatitude();
         double mLongtitude = location.getLongitude();
 
-        GeoPoint gpt = new GeoPoint(mLatitude, mLongtitude);
-        mapController.setCenter(gpt);
+        point = new GeoPoint(mLatitude, mLongtitude);
+        ArrayList arr = new ArrayList<>();
+        OverlayItem marker = new OverlayItem("", "", point);
+        Drawable drawable = context.getResources().getDrawable(R.drawable.ic_mylocation);
+        marker.setMarker(drawable);
+        arr.add(marker);
+
         // xóa vị trí cũ
-        mMap.getOverlays().remove(this.mLocationOverlay);
-        //mMap.getOverlays().clear();
+        if (this.mLocationOverlay != null)
+            mMap.getOverlays().remove(this.mLocationOverlay);
+        else
+            mapController.setCenter(point);
+
+        this.mLocationOverlay = new ItemizedOverlayWithFocus<OverlayItem>(context, arr, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+            @Override
+            public boolean onItemSingleTapUp(int i, OverlayItem overlayItem) {
+                return false;
+            }
+
+            @Override
+            public boolean onItemLongPress(int i, OverlayItem overlayItem) {
+                return false;
+            }
+        });
         // add vị trí mới
         mMap.getOverlays().add(this.mLocationOverlay);
+        if (isFollow)
+            mapController.setCenter(point);
         mMap.invalidate();
     }
 
@@ -50,5 +87,9 @@ public class LocationChange implements LocationListener {
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    public GeoPoint getMyLocation(){
+        return point;
     }
 }

@@ -35,6 +35,7 @@ import com.hcmus.dreamers.foodmap.adapter.PlaceAutoCompleteApdapter;
 import com.hcmus.dreamers.foodmap.common.FoodMapApiManager;
 import com.hcmus.dreamers.foodmap.define.ConstantCODE;
 import com.hcmus.dreamers.foodmap.event.LocationChange;
+import com.hcmus.dreamers.foodmap.map.LocationDirection;
 import com.hcmus.dreamers.foodmap.map.ZoomLimitMapView;
 
 import org.osmdroid.api.IMapController;
@@ -45,6 +46,7 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.TilesOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
@@ -55,7 +57,7 @@ import java.util.List;
 public class MapActivity extends AppCompatActivity{
 
     private MapView mMap;
-    private MyLocationNewOverlay mLocationOverlay;
+    private LocationChange mLocation;
     private LocationManager mLocMgr;
     private IMapController mapController;
     private GeoPoint startPoint;
@@ -70,8 +72,6 @@ public class MapActivity extends AppCompatActivity{
     private GeoPoint startPointEx;
     private String startName;
     private String startAddress;
-    private String endName;
-    private String endAddress;
     @Override
     protected void onPause() {
         super.onPause();
@@ -114,6 +114,13 @@ public class MapActivity extends AppCompatActivity{
                 return;
             }
             Location location = mLocMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location == null)
+                location = mLocMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            if (location == null)
+            {
+                Toast.makeText(MapActivity.this, "Không thể lấy được vị trí hiện tại", Toast.LENGTH_LONG).show();
+                finish();
+            }
             double lat = location.getLatitude();
             double lon = location.getLongitude();
             startPoint = new GeoPoint(lat, lon);
@@ -162,20 +169,13 @@ public class MapActivity extends AppCompatActivity{
         mapController.setZoom(17.0);
         mMap.setTileSource(TileSourceFactory.MAPNIK);
 
-        this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(MapActivity.this),mMap);
-        mLocationOverlay.enableMyLocation();
-        Bitmap iconMyLocation = BitmapFactory.decodeResource(getResources(),R.drawable.ic_mylocation);
-        mLocationOverlay.setPersonIcon(iconMyLocation);
-
         mLocMgr = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        mLocMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 100,
-                new LocationChange(mMap, mLocationOverlay, mapController));
-
-        mapController.setCenter(this.mLocationOverlay.getMyLocation());
-        mMap.getOverlays().add(this.mLocationOverlay);
+        mLocation = new LocationChange(MapActivity.this, mMap, mapController, false);
+        mLocMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocation);
+        mLocMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mLocation);
     }
 
     private void addMarker(String title, String description, GeoPoint point){
@@ -224,7 +224,12 @@ public class MapActivity extends AppCompatActivity{
                 int code = (int)response;
                 if (code == ConstantCODE.NOTINTERNET){
                     Toast.makeText(MapActivity.this, "Không thể tìm được đường đi", Toast.LENGTH_LONG);
-                    moveCamera(mLocationOverlay.getMyLocation());
+                }
+                else {
+                    if (mLocation.getMyLocation() != null)
+                    {
+                        moveCamera(mLocation.getMyLocation());
+                    }
                 }
             }
         });
@@ -232,7 +237,6 @@ public class MapActivity extends AppCompatActivity{
     }
 
     void searchAutoCompleteSupportInit(){
-
         final Dialog dialog = new Dialog(MapActivity.this);
         dialog.setContentView(R.layout.dialog_input_location);
         dialog.setCanceledOnTouchOutside(true);
@@ -258,7 +262,7 @@ public class MapActivity extends AppCompatActivity{
             @Override
             public void afterTextChanged(Editable s) {
                 String address = s.toString();
-                if (address.length() >= 3)
+                if (address.length() > 1)
                     refeshListAddressSearch(address);
             }
         });
@@ -276,7 +280,6 @@ public class MapActivity extends AppCompatActivity{
                 startAddress = detailAddresses.get(position).toString();
                 startPointEx = detailAddresses.get(position).getPoint();
                 atclStart.setText( startAddress);
-
             }
         });
 

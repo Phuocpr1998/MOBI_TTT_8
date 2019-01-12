@@ -417,10 +417,24 @@ public class GenerateRequest {
         return request;
     }
 
-    public static okhttp3.Request getOffer(int id_rest) {
+    public static okhttp3.Request getOffer(int id_rest, String token) {
         String baseUrl = ConstantURL.BASEURL + ConstantURL.GETOFFER;
         Map<String, String> params = new HashMap<>();
         params.put("id_rest", String.valueOf(id_rest));
+        params.put("token", token);
+        String url = Utils.buildUrl(baseUrl, params);
+        okhttp3.Request request = new okhttp3.Request.Builder()
+                .url(url)
+                .get()
+                .addHeader("Authorization", "header value") //Notice this request has header if you don't need to send a header just erase this part
+                .build();
+        return request;
+    }
+
+    public static okhttp3.Request getOfferGuest(String guest_email) {
+        String baseUrl = ConstantURL.BASEURL + ConstantURL.GETGUESTOFFER;
+        Map<String, String> params = new HashMap<>();
+        params.put("guest_email", guest_email);
         String url = Utils.buildUrl(baseUrl, params);
         okhttp3.Request request = new okhttp3.Request.Builder()
                 .url(url)
@@ -574,10 +588,11 @@ public class GenerateRequest {
         return request;
     }
 
-    public static okhttp3.Request deleteOffer(int idOffer) {
+    public static okhttp3.Request deleteOffer(int idOffer, String guest_email) {
         String url = ConstantURL.BASEURL + ConstantURL.DELETEOFFER;
         Map<String, String> params = new HashMap<>();
         params.put("id_offer", String.valueOf(idOffer));
+        params.put("guest_email", guest_email);
         RequestBody bodyRequest = Utils.buildParameter(params);
         okhttp3.Request request = new okhttp3.Request.Builder()
                 .url(url)
@@ -587,7 +602,7 @@ public class GenerateRequest {
         return request;
     }
 	
-	    public static okhttp3.Request createDiscount(final Discount discount, final String token) {
+    public static okhttp3.Request createDiscount(final Discount discount, final String token) {
         String baseUrl = ConstantURL.BASEURL + ConstantURL.CREATEDISCOUNT;
         Map<String, String> params = new HashMap<>();
         params.put("id_rest", String.valueOf(discount.getId_rest()));

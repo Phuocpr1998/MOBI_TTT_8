@@ -39,7 +39,7 @@
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         android:textAllCaps="false"
-        android:text="Sign in with Facebook"
+        android:text="Đăng nhập với Facebook"
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="#ffff"/>

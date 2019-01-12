@@ -3,11 +3,11 @@ include "../../private/database.php";
 
 $response = array();
 
-if (isset($_POST["id_offer"]))
+if (isset($_POST["id_offer"]) && isset($_POST["guest_email"]))
 {
 	$conn = new database();
 	$conn->connect();
-	if ($conn->DeleteOffer($_POST["id_offer"]) != -1)
+	if ($conn->DeleteOffer($_POST["id_offer"], $_POST["guest_email"]) != -1)
 	{
 		$response["status"] = 200;
 		$response["message"] = "Success";

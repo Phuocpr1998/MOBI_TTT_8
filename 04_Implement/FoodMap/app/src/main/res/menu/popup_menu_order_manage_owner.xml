@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/btnAcceptOrder"
+        android:title="Chấp nhận đơn hàng"/>
+    <item
+        android:id="@+id/btnDenyOrder"
+        android:title="Từ chối đơn hàng"/>
+</menu>
