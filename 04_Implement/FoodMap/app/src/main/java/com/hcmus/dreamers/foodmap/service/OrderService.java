@@ -16,6 +16,7 @@ import android.support.v4.app.NotificationCompat;
 import com.github.nkzawa.socketio.client.Socket;
 import com.hcmus.dreamers.foodmap.AsyncTask.TaskCompleteCallBack;
 import com.hcmus.dreamers.foodmap.EditRestaurantActivity;
+import com.hcmus.dreamers.foodmap.MainActivity;
 import com.hcmus.dreamers.foodmap.Model.Guest;
 import com.hcmus.dreamers.foodmap.Model.Offer;
 import com.hcmus.dreamers.foodmap.Model.Owner;
@@ -130,7 +131,7 @@ public class OrderService extends Service {
         createNotificationChannel();
         int NOTIFICATION_ID = 12345;
 
-        Intent targetIntent = new Intent(this, RestaurantManageActivity.class);
+        Intent targetIntent = new Intent(this, MainActivity.class);
         targetIntent.putExtra("id_rest", id_rest);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(contentIntent);
