@@ -105,10 +105,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if((Owner.getInstance() != null) && !Owner.getInstance().getEmail().equals("")  && OrderSocket.isNULL()){
+        if((Owner.getInstance() != null) && (!Owner.getInstance().getUsername().equals(""))  && OrderSocket.isNULL()){ //&&
             //start service
             Intent myIntent = new Intent(MainActivity.this, OrderService.class);
             myIntent.putExtra("email", Owner.getInstance().getUsername());
+            // Gọi phương thức startService (Truyền vào đối tượng Intent)
+            startService(myIntent);
+        }else if((Guest.getInstance() != null) && !Guest.getInstance().getEmail().equals("")  && OrderSocket.isNULL()){
+            //start service
+            Intent myIntent = new Intent(MainActivity.this, OrderService.class);
+            myIntent.putExtra("email", Guest.getInstance().getEmail());
             // Gọi phương thức startService (Truyền vào đối tượng Intent)
             startService(myIntent);
         }
