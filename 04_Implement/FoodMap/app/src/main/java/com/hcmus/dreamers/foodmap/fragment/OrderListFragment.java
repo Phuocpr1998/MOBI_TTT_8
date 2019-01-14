@@ -23,6 +23,7 @@ import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.github.nkzawa.socketio.client.Socket;
 import com.hcmus.dreamers.foodmap.AsyncTask.TaskCompleteCallBack;
 import com.hcmus.dreamers.foodmap.Model.Guest;
 import com.hcmus.dreamers.foodmap.Model.Offer;
@@ -34,6 +35,7 @@ import com.hcmus.dreamers.foodmap.common.FoodMapApiManager;
 import com.hcmus.dreamers.foodmap.common.ResponseJSON;
 import com.hcmus.dreamers.foodmap.define.ConstantCODE;
 import com.hcmus.dreamers.foodmap.jsonapi.ParseJSON;
+import com.hcmus.dreamers.foodmap.websocket.OrderSocket;
 
 import org.json.JSONException;
 
@@ -51,7 +53,7 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
 
     Restaurant restaurant;
     private static final String TAG = "OrderListFragment";
-
+    private Socket socket;
     private ListView listOffer;
     private int position;
     private OrderListAdapter adapter;
@@ -64,6 +66,7 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
 
     public OrderListFragment() {
         // Required empty public constructor
+        this.socket = OrderSocket.getInstance();
     }
 
     public void setId_rest(int id_rest) {
@@ -167,6 +170,8 @@ public class OrderListFragment extends Fragment implements AdapterView.OnItemLon
                             public void OnTaskComplete(Object response) {
                                 progressDialog.dismiss();
                                 if ((int) response == ConstantCODE.SUCCESS) {
+                                    String content = "{\"email_guest\":\"" + offer.getGuestEmail() + "\", \"status\":333, \"message\":\"Đơn hàng đã bị hủy!\"}";
+                                    socket.emit("send_result", content);
                                     Offer o = offersAdapter.get(position);
                                     int index = offers.indexOf(o);
                                     offersAdapter.get(position).setStatus(-1);

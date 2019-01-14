@@ -36,6 +36,7 @@ public class Owner extends com.hcmus.dreamers.foodmap.Model.User {
 
     private Owner() {
         super();
+        this.username = "";
         listRestaurant = new ArrayList<Restaurant>();
     }
 

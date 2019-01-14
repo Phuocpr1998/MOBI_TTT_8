@@ -16,7 +16,10 @@ import android.support.v4.app.NotificationCompat;
 import com.github.nkzawa.socketio.client.Socket;
 import com.hcmus.dreamers.foodmap.AsyncTask.TaskCompleteCallBack;
 import com.hcmus.dreamers.foodmap.EditRestaurantActivity;
+import com.hcmus.dreamers.foodmap.MainActivity;
+import com.hcmus.dreamers.foodmap.Model.Guest;
 import com.hcmus.dreamers.foodmap.Model.Offer;
+import com.hcmus.dreamers.foodmap.Model.Owner;
 import com.hcmus.dreamers.foodmap.OrderListActivity;
 import com.hcmus.dreamers.foodmap.R;
 import com.hcmus.dreamers.foodmap.RestaurantManageActivity;
@@ -57,10 +60,33 @@ public class OrderService extends Service {
                     }
                 });
             } catch (JSONException e) {
-                e.printStackTrace();
             }
         }
     });
+
+
+
+    private OrderEmitterListener receiveResult = new OrderEmitterListener(new TaskCompleteCallBack() {
+        @Override
+        public void OnTaskComplete(Object response) {
+            try {
+                JSONObject resp = new JSONObject(response.toString());
+                notification("Thông báo", resp.getString("message"));
+//                if((int)response == ConstantCODE.REFUSE){
+//                    //NotificationBuilder.ShowNotification(OrderService.this, "Thông báo", offer.getGuestEmail() + " vừa mới đặt hàng.");
+//                    notification("Thông báo", resp.getString("message"));
+//                }else if((int)response == ConstantCODE.SUCCESS){
+//                    notification("Thông báo", resp.getString("message"));
+//                }else if((int)response == ConstantCODE.FAILED){
+//                    notification("Thông báo", resp.getString("message"));
+//                }else{
+//
+//                }
+            } catch (JSONException e) {
+            }
+        }
+    });
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -72,7 +98,10 @@ public class OrderService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String email = intent.getStringExtra("email");
         socket.emit("register", email);
-        socket.on("receive_order", receiceOrder);
+        if(Owner.getInstance() != null && !Owner.getInstance().getUsername().equals(""))
+            socket.on("receive_order", receiceOrder);
+        else if(Guest.getInstance() != null && !Guest.getInstance().getEmail().equals(""))
+            socket.on("receive_result", receiveResult);
         return START_STICKY;
     }
 
@@ -102,7 +131,7 @@ public class OrderService extends Service {
         createNotificationChannel();
         int NOTIFICATION_ID = 12345;
 
-        Intent targetIntent = new Intent(this, RestaurantManageActivity.class);
+        Intent targetIntent = new Intent(this, MainActivity.class);
         targetIntent.putExtra("id_rest", id_rest);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(contentIntent);
