@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:title="Thêm Discount"/>
+            app:title="Thêm Order"/>
 
     </android.support.design.widget.AppBarLayout>
 
