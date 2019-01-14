@@ -191,10 +191,12 @@ public class DishListFragment extends Fragment {
                     if (!isDelete) {
                         String dishJSON = data.getStringExtra("dishJSON");
                         dish = gson.fromJson(dishJSON, Dish.class);
-                        visibleDishes.set(selectedRow, dish);
+                        visibleDishes.set(selectedRow, dish);       // danh sách các món nhìn thấy đc
+                        dishes.set(selectedRow, dish);              // danh sách ban đầu
                         Toast.makeText(context, "Cập nhật thành công!", Toast.LENGTH_LONG).show();
                     } else {
-                        visibleDishes.remove(selectedRow);
+                        visibleDishes.remove(selectedRow);          //danh sách các món nhìn thấy được
+                        dishes.remove(selectedRow);                 // danh sách ban đầu
                         Toast.makeText(context, "Xóa thành công!", Toast.LENGTH_LONG).show();
                     }
                     adapter.notifyDataSetChanged();
@@ -207,7 +209,8 @@ public class DishListFragment extends Fragment {
                 String dishJSON = data.getStringExtra("dishJSON");
                 dish = gson.fromJson(dishJSON, Dish.class);
 
-                visibleDishes.add(dish);
+                visibleDishes.add(dish);           // danh sách các món nhìn thấy đc
+                dishes.add(dish);                   // danh sách ban đầu
                 adapter.notifyDataSetChanged();
             }
         } catch (Exception e) {
