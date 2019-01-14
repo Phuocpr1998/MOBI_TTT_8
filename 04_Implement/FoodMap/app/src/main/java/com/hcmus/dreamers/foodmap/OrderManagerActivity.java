@@ -83,6 +83,7 @@ public class OrderManagerActivity extends AppCompatActivity {
                                                 public void OnTaskComplete(Object response) {
                                                     progressDialog.dismiss();
                                                     if((int)response == ConstantCODE.SUCCESS){
+
                                                         Toast.makeText(OrderManagerActivity.this, "Hủy đơn hàng thành công!", Toast.LENGTH_SHORT).show();
                                                         loadData();
                                                     }else if((int) response == ConstantCODE.NOTFOUND){

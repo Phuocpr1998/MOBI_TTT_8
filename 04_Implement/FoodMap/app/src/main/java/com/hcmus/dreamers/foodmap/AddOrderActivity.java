@@ -90,7 +90,7 @@ public class AddOrderActivity extends AppCompatActivity {
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (edtTotal.getText().length() == 0 || Integer.getInteger(edtTotal.getText().toString()) <= 0) {
+                if (edtTotal.getText().length() == 0 || Integer.parseInt(edtTotal.getText().toString()) <= 0) {
                     Toast.makeText(AddOrderActivity.this, "Số lượng không hợp lệ", Toast.LENGTH_SHORT).show();
                     return;
                 }
