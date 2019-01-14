@@ -47,7 +47,7 @@ public class DishListFragment extends Fragment {
     CoordinatorLayout rootLayout;
     Button btnLoadMoreDish;
     int lastVisibleDishIndex = -1; // includesive [0, lastVisibleDishIndex)
-    final int NUMBER_OF_DISH_ITEM_LOAD = 3;     // Số món ăn mỗi lần tải thêm
+    final int NUMBER_OF_DISH_ITEM_LOAD = 5;     // Số món ăn mỗi lần tải thêm
     final int DEFAULT_NUMBER_DISH_DISPLAY = 5;      // Số món ăn hiển thị ban đầu
 
     // arbitrary interprocess communication ID (just a nickname!)
