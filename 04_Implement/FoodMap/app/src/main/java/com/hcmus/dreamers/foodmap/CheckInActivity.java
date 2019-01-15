@@ -261,11 +261,11 @@ public class CheckInActivity extends AppCompatActivity {
                 Log.e("Get Bitmap",e.getMessage());
             }
         }
-        try {
+/*        try {
             callbackManager.onActivityResult(requestCode, resultCode, data);
         }catch(Exception e){
             e.printStackTrace();
-        }
+        }*/
     }
 
     @Override

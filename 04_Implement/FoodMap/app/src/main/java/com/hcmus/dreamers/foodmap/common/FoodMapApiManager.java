@@ -1058,7 +1058,7 @@ public class FoodMapApiManager {
                         taskCompleteCallBack.OnTaskComplete(ConstantCODE.SUCCESS);
                     }
                     else if (responseJSON.getCode() == ConstantCODE.NOTFOUND) {
-                        taskCompleteCallBack.OnTaskComplete(ConstantCODE.NOTFOUND); // trường hợp đã tồn tại
+                        taskCompleteCallBack.OnTaskComplete(ConstantCODE.NOTFOUND);
                     }
                     else if (responseJSON.getCode() == ConstantCODE.NOTINTERNET){
                         taskCompleteCallBack.OnTaskComplete(ConstantCODE.NOTINTERNET);
